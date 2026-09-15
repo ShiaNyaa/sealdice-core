@@ -232,6 +232,7 @@ require (
 )
 
 replace (
+	github.com/Szzrain/Milky-go-sdk => github.com/ShiaNyaa/Milky-go-sdk v1.1.1-0.20260915101620-e88211a894c8
 	github.com/Szzrain/dodo-open-go v0.2.7 => github.com/sealdice/dodo-open-go v0.2.8
 	// Try to fix sqlite in cgofree
 	// github.com/glebarez/sqlite v1.11.0 => github.com/PaienNate/sqlite v0.0.0-20241102151933-067d82f14685
