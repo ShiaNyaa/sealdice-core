@@ -42,7 +42,7 @@
       </main>
     </div>
 
-    <AppMobileTabBar @open-menu="drawerMenu = true" />
+    <AppMobileTabBar v-show="!drawerMenu" @open-menu="drawerMenu = true" />
 
     <n-drawer
       v-model:show="drawerMenu"
