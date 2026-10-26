@@ -16,17 +16,15 @@
         </button>
         <n-tooltip v-if="overview?.runtime.containerMode">
           <template #trigger>
-            <n-button text size="tiny" class="container-indicator">
-              <template #icon>
-                <n-icon>
-                  <i-tabler-package />
-                </n-icon>
-              </template>
-            </n-button>
+            <span class="brand-badge" aria-label="容器模式">容器</span>
           </template>
           当前以容器模式启动，部分功能受到限制。
         </n-tooltip>
       </div>
+      <span class="brand-meta">
+        {{ overview?.version.simple ?? '海豹核心' }}
+        <template v-if="channelText"> · {{ channelText }}</template>
+      </span>
     </div>
   </div>
 </template>
@@ -48,89 +46,81 @@ const emit = defineEmits<{
   enableAdvancedConfig: [];
 }>();
 
-const { overview, appName } = useBaseOverview();
+const { overview, appName, channelText } = useBaseOverview();
 </script>
 
 <style scoped>
 .sd-sidebar-brand {
   display: flex;
-  min-height: 70px;
+  flex: 0 0 auto;
   align-items: center;
+  border-bottom: 1px solid var(--sd-border-soft);
   gap: 0.65rem;
-  margin-bottom: 0.65rem;
-  padding: 1rem 1rem 0.75rem;
-  border-bottom: 1px solid var(--sd-border-sidebar);
-  color: var(--sd-text-inverse);
-  line-height: 1;
+  margin: 0 0.7rem;
+  padding: 1.05rem 0.3rem 0.95rem;
 }
 
 .sd-sidebar-brand.collapsed {
   justify-content: center;
-  min-height: 70px;
-  margin-bottom: 0.65rem;
-  padding: 1rem 0.5rem 0.75rem;
+  margin: 0 0.35rem;
+  padding: 1.05rem 0 0.95rem;
 }
 
 .brand-mark {
   display: inline-flex;
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   border: 0;
   border-radius: var(--sd-radius-sm);
-  background: var(--sd-primary);
-  background: linear-gradient(
-    145deg,
-    color-mix(in srgb, var(--sd-primary) 76%, var(--sd-bg-elevated)),
-    color-mix(in srgb, var(--sd-primary) 54%, var(--sd-bg-elevated))
-  );
+  background: transparent;
   cursor: pointer;
   margin: 0;
   padding: 0;
-  transition:
-    background-color var(--sd-transition-fast),
-    filter var(--sd-transition-fast),
-    transform var(--sd-transition-fast);
+  transition: transform var(--sd-transition-base);
 }
 
 .brand-mark:hover {
-  filter: brightness(1.05);
+  transform: rotate(-6deg) scale(1.05);
 }
 
 .brand-mark:active {
-  transform: translateY(1px);
+  transform: scale(0.94);
 }
 
 .brand-mark-image {
   display: block;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
 }
 
 .brand-info {
-  flex: 1;
+  display: flex;
+  flex: 1 1 auto;
   min-width: 0;
+  flex-direction: column;
+  gap: 0.1rem;
 }
 
 .brand-title-row {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0.35rem;
 }
 
-/* 产品名与 logo 同为品牌标识，字号取到与图标块同一视觉层级。 */
 .brand-title {
   overflow: hidden;
   border: 0;
   background: transparent;
-  color: var(--sd-text-inverse);
+  color: var(--sd-text-primary);
   cursor: pointer;
   font: inherit;
-  font-size: 1.05rem;
-  font-weight: 650;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   line-height: 1.25;
   padding: 0;
   text-align: left;
@@ -138,22 +128,21 @@ const { overview, appName } = useBaseOverview();
   white-space: nowrap;
 }
 
-.container-indicator {
-  color: var(--sd-text-inverse-soft);
+.brand-badge {
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius-pill);
+  color: var(--sd-text-muted);
+  font-size: 0.625rem;
+  line-height: 1;
+  padding: 0.15rem 0.35rem;
 }
 
-.runtime-text {
+.brand-meta {
   overflow: hidden;
-  color: var(--sd-text-inverse-muted);
-  font-size: 0.68rem;
-  line-height: 1.35;
-  margin-top: 0.18rem;
+  color: var(--sd-text-muted);
+  font-size: 0.6875rem;
+  line-height: 1.3;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-@supports (color: color-mix(in srgb, white, black)) {
-  .container-indicator {
-    color: color-mix(in srgb, var(--sd-text-inverse), transparent 14%);
-  }
 }
 </style>

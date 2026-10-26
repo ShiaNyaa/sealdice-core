@@ -1,17 +1,15 @@
+/*
+ * SealDice Design System — "Abyss"
+ * ------------------------------------------------------------------
+ * 设计原则：
+ * 1. 表面分层靠明度差与极细边框，不靠重阴影堆叠。
+ * 2. 强调色只出现在主要动作、当前状态与关键数据上。
+ * 3. 中文走系统字形，拉丁与数字走 Geist，数字统一等宽对齐。
+ * 4. 所有语义色都成对提供 soft / border，避免页面各自临时调色。
+ */
+
 html {
   font-size: 16px;
-}
-
-@font-face {
-  font-family: 'JetBrains Mono Variable';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 100 800;
-  src: url('@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2')
-    format('woff2-variations');
-  unicode-range:
-    U+0000-00ff, U+0131, U+0152-0153, U+02bb-02bc, U+02c6, U+02da, U+02dc, U+0304, U+0308, U+0329,
-    U+2000-206f, U+20ac, U+2122, U+2191, U+2193, U+2212, U+2215, U+feff, U+fffd;
 }
 
 html,
@@ -20,65 +18,82 @@ body {
 }
 
 :root {
-  --sd-primary: #3069e5;
-  --sd-success: #218755;
-  --sd-warning: #a26b0c;
-  --sd-error: #dd2929;
+  color-scheme: light;
+
+  /* 语义色 */
+  --sd-primary: #2f5fe0;
+  --sd-success: #16794a;
+  --sd-warning: #9a6408;
+  --sd-error: #cf2f36;
   --sd-info: var(--sd-primary);
   --sd-accent: var(--sd-primary);
-  --sd-accent-strong: #1f4cbf;
-  --sd-primary-soft: #e9f0fd;
-  --sd-primary-soft: color-mix(in srgb, var(--sd-primary) 9%, transparent);
-  --sd-primary-soft-strong: #d9e4fb;
-  --sd-primary-soft-strong: color-mix(in srgb, var(--sd-primary) 16%, transparent);
-  --sd-primary-border: #b9cbf5;
-  --sd-primary-border: color-mix(in srgb, var(--sd-primary) 22%, transparent);
-  --sd-success-soft: #e7f3ed;
+  --sd-accent-strong: #1d47b8;
+
+  --sd-primary-soft: color-mix(in srgb, var(--sd-primary) 8%, transparent);
+  --sd-primary-soft-strong: color-mix(in srgb, var(--sd-primary) 14%, transparent);
+  --sd-primary-border: color-mix(in srgb, var(--sd-primary) 20%, transparent);
   --sd-success-soft: color-mix(in srgb, var(--sd-success) 9%, transparent);
-  --sd-success-soft-strong: #d2e9dc;
   --sd-success-soft-strong: color-mix(in srgb, var(--sd-success) 16%, transparent);
-  --sd-success-border: #b1d6c4;
   --sd-success-border: color-mix(in srgb, var(--sd-success) 22%, transparent);
-  --sd-warning-soft: #f6eedf;
   --sd-warning-soft: color-mix(in srgb, var(--sd-warning) 10%, transparent);
-  --sd-warning-soft-strong: #eedfc4;
   --sd-warning-soft-strong: color-mix(in srgb, var(--sd-warning) 18%, transparent);
-  --sd-warning-border: #dec894;
   --sd-warning-border: color-mix(in srgb, var(--sd-warning) 24%, transparent);
-  --sd-error-soft: #fbeaeb;
-  --sd-error-soft: color-mix(in srgb, var(--sd-error) 10%, transparent);
-  --sd-error-soft-strong: #f7d6d8;
-  --sd-error-soft-strong: color-mix(in srgb, var(--sd-error) 18%, transparent);
-  --sd-error-border: #efb3b7;
-  --sd-error-border: color-mix(in srgb, var(--sd-error) 24%, transparent);
-  --sd-bg-app: #f4f6f9;
-  --sd-bg-page: #f4f6f9;
-  --sd-bg-shell: #f4f6f9;
-  --sd-bg-sidebar: #243247;
+  --sd-error-soft: color-mix(in srgb, var(--sd-error) 9%, transparent);
+  --sd-error-soft-strong: color-mix(in srgb, var(--sd-error) 16%, transparent);
+  --sd-error-border: color-mix(in srgb, var(--sd-error) 22%, transparent);
+
+  /* 明度层次 */
+  --sd-bg-app: #f2f4f8;
+  --sd-bg-page: #f2f4f8;
+  --sd-bg-shell: #f7f8fb;
+  --sd-bg-sidebar: #fbfcfe;
   --sd-bg-elevated: #ffffff;
-  --sd-bg-control: #f1f4f8;
-  --sd-bg-control-hover: #e8edf4;
-  --sd-bg-hover: rgba(15, 23, 42, 0.055);
+  --sd-bg-elevated-soft: #f7f9fc;
+  --sd-bg-elevated-muted: #eef1f6;
+  --sd-bg-elevated-tint: rgba(255, 255, 255, 0.86);
+  --sd-bg-control: #f1f3f8;
+  --sd-bg-control-hover: #e8ecf3;
+  --sd-bg-hover: rgba(15, 23, 36, 0.045);
   --sd-bg-selected: var(--sd-primary-soft);
   --sd-bg-selected-strong: var(--sd-primary-soft-strong);
-  --sd-text-primary: #172033;
-  --sd-text-secondary: #526078;
-  --sd-text-muted: #8490a3;
+
+  /* 文本 */
+  --sd-text-primary: #101724;
+  --sd-text-secondary: #4d596c;
+  --sd-text-muted: #838e9f;
   --sd-text-inverse: #ffffff;
-  --sd-border: #d9e0e9;
-  --sd-border-soft: #e6ebf1;
-  --sd-radius-xs: 4px;
-  --sd-radius-sm: 6px;
-  --sd-radius-md: 8px;
-  --sd-radius-lg: 10px;
+  --sd-text-inverse-soft: rgba(16, 23, 36, 0.68);
+  --sd-text-inverse-muted: rgba(16, 23, 36, 0.44);
+
+  /* 描边 */
+  --sd-border: #e2e6ee;
+  --sd-border-soft: #eceff4;
+  --sd-border-sidebar: #e7eaf1;
+
+  /* 侧边栏（浅色壳） */
+  --sd-bg-sidebar-hover: rgba(15, 23, 36, 0.045);
+  --sd-bg-sidebar-pressed: rgba(15, 23, 36, 0.075);
+  --sd-bg-sidebar-selected: color-mix(in srgb, var(--sd-primary) 9%, transparent);
+  --sd-bg-sidebar-selected-strong: color-mix(in srgb, var(--sd-primary) 14%, transparent);
+
+  /* 形态 */
+  --sd-radius-xs: 5px;
+  --sd-radius-sm: 7px;
+  --sd-radius-md: 10px;
+  --sd-radius-lg: 14px;
   --sd-radius-pill: 999px;
-  --sd-page-title-size: 1.5rem;
-  --sd-page-title-weight: 700;
-  --sd-page-title-line-height: 1.25;
-  --sd-font-code:
-    'JetBrains Mono Variable', 'PingFang SC', 'Helvetica Neue', 'Hiragino Sans GB', 'Segoe UI',
+  --sd-page-title-size: 1.625rem;
+  --sd-page-title-weight: 600;
+  --sd-page-title-line-height: 1.2;
+
+  --sd-font-sans:
+    'Geist Variable', 'PingFang SC', 'HarmonyOS Sans SC', 'MiSans', 'Hiragino Sans GB',
     'Microsoft YaHei', '微软雅黑', sans-serif;
-  --sd-content-max-width: 1180px;
+  --sd-font-code:
+    'Geist Mono Variable', 'JetBrains Mono Variable', 'PingFang SC', 'Microsoft YaHei', monospace;
+  --sd-content-max-width: 1240px;
+
+  /* 间距 */
   --sd-space-2xs: 0.25rem;
   --sd-space-xs: 0.5rem;
   --sd-space-sm: 0.75rem;
@@ -86,28 +101,24 @@ body {
   --sd-space-lg: 1.25rem;
   --sd-space-xl: 1.5rem;
   --sd-space-2xl: 2rem;
-  --sd-page-section-gap: var(--sd-space-md);
-  --sd-item-stack-gap: var(--sd-space-sm);
-  --sd-scrollbar-thumb: rgba(31, 41, 55, 0.34);
-  --sd-scrollbar-thumb-hover: rgba(31, 41, 55, 0.45);
-  --sd-bg-elevated-soft: #f7f9fb;
-  --sd-bg-elevated-muted: #edf1f6;
-  --sd-bg-elevated-tint: rgba(255, 255, 255, 0.94);
-  --sd-text-inverse-soft: rgba(255, 255, 255, 0.82);
-  --sd-text-inverse-muted: rgba(255, 255, 255, 0.56);
-  --sd-bg-sidebar-hover: rgba(255, 255, 255, 0.07);
-  --sd-bg-sidebar-pressed: rgba(255, 255, 255, 0.12);
-  --sd-bg-sidebar-selected: #3c5383;
-  --sd-bg-sidebar-selected: color-mix(in srgb, var(--sd-primary) 26%, transparent);
-  --sd-bg-sidebar-selected-strong: #405d99;
-  --sd-bg-sidebar-selected-strong: color-mix(in srgb, var(--sd-primary) 32%, transparent);
-  --sd-border-sidebar: rgba(255, 255, 255, 0.07);
-  --sd-overlay: rgba(15, 23, 42, 0.34);
-  --sd-shadow-floating: 0 10px 30px rgba(15, 23, 42, 0.12);
-  --sd-shadow-panel: 0 10px 26px rgba(15, 23, 42, 0.08);
-  --sd-shadow-drawer: -18px 0 42px rgba(15, 23, 42, 0.18);
-  --sd-transition-fast: 140ms ease;
-  --sd-transition-base: 180ms ease;
+  --sd-page-section-gap: 1.25rem;
+  --sd-item-stack-gap: 0.75rem;
+
+  /* 阴影：只用来抬升浮层，静态表面一律不投影 */
+  --sd-shadow-floating:
+    0 1px 2px rgba(16, 23, 36, 0.05), 0 12px 32px -12px rgba(16, 23, 36, 0.18);
+  --sd-shadow-panel: 0 1px 2px rgba(16, 23, 36, 0.04), 0 8px 24px -16px rgba(16, 23, 36, 0.16);
+  --sd-shadow-drawer: -24px 0 64px rgba(16, 23, 36, 0.18);
+
+  --sd-overlay: rgba(12, 18, 30, 0.36);
+  --sd-scrollbar-thumb: rgba(16, 23, 36, 0.18);
+  --sd-scrollbar-thumb-hover: rgba(16, 23, 36, 0.3);
+
+  --sd-transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --sd-transition-base: 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  --sd-transition-slow: 420ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* QQ 风格组件（指令测试聊天窗）依赖的兼容变量 */
   --qq-background-03: var(--sd-bg-page);
   --qq-border_standard: var(--sd-border-soft);
   --qq-bg_bottom_light: var(--sd-bg-elevated);
@@ -125,8 +136,8 @@ body {
   --qq-text_white: var(--sd-text-inverse);
   --qq-text_link: var(--sd-primary);
   --qq-text_primary: var(--sd-text-primary);
-  --qq-text_primary_light: rgba(17, 24, 39, 0.64);
-  --qq-text_secondary: rgba(17, 24, 39, 0.54);
+  --qq-text_primary_light: rgba(16, 23, 36, 0.64);
+  --qq-text_secondary: rgba(16, 23, 36, 0.54);
   --on_brand_primary: var(--sd-text-inverse);
   --on_bubble_host_text: var(--sd-text-inverse);
   --qq-tag_red_bg: var(--sd-error-soft);
@@ -145,62 +156,67 @@ body {
 }
 
 .dark {
-  --sd-primary: #6791f1;
-  --sd-success: #4cac73;
-  --sd-warning: #ca9438;
-  --sd-error: #ea6666;
-  --sd-accent-strong: #89a9ea;
-  --sd-primary-soft: rgba(103, 145, 241, 0.16);
-  --sd-primary-soft: color-mix(in srgb, var(--sd-primary) 16%, transparent);
-  --sd-primary-soft-strong: rgba(103, 145, 241, 0.24);
-  --sd-primary-soft-strong: color-mix(in srgb, var(--sd-primary) 24%, transparent);
-  --sd-primary-border: rgba(103, 145, 241, 0.28);
+  color-scheme: dark;
+
+  --sd-primary: #6f96ff;
+  --sd-success: #4fbd86;
+  --sd-warning: #d8a24a;
+  --sd-error: #f2757a;
+  --sd-accent-strong: #9db8ff;
+
+  --sd-primary-soft: color-mix(in srgb, var(--sd-primary) 14%, transparent);
+  --sd-primary-soft-strong: color-mix(in srgb, var(--sd-primary) 22%, transparent);
   --sd-primary-border: color-mix(in srgb, var(--sd-primary) 28%, transparent);
-  --sd-success-soft: rgba(76, 172, 115, 0.14);
   --sd-success-soft: color-mix(in srgb, var(--sd-success) 14%, transparent);
-  --sd-success-soft-strong: rgba(76, 172, 115, 0.22);
   --sd-success-soft-strong: color-mix(in srgb, var(--sd-success) 22%, transparent);
-  --sd-success-border: rgba(76, 172, 115, 0.28);
-  --sd-success-border: color-mix(in srgb, var(--sd-success) 28%, transparent);
-  --sd-warning-soft: rgba(202, 148, 56, 0.14);
+  --sd-success-border: color-mix(in srgb, var(--sd-success) 30%, transparent);
   --sd-warning-soft: color-mix(in srgb, var(--sd-warning) 14%, transparent);
-  --sd-warning-soft-strong: rgba(202, 148, 56, 0.22);
   --sd-warning-soft-strong: color-mix(in srgb, var(--sd-warning) 22%, transparent);
-  --sd-warning-border: rgba(202, 148, 56, 0.28);
   --sd-warning-border: color-mix(in srgb, var(--sd-warning) 28%, transparent);
-  --sd-error-soft: rgba(234, 102, 102, 0.14);
   --sd-error-soft: color-mix(in srgb, var(--sd-error) 14%, transparent);
-  --sd-error-soft-strong: rgba(234, 102, 102, 0.22);
   --sd-error-soft-strong: color-mix(in srgb, var(--sd-error) 22%, transparent);
-  --sd-error-border: rgba(234, 102, 102, 0.28);
   --sd-error-border: color-mix(in srgb, var(--sd-error) 28%, transparent);
-  --sd-bg-app: #0c111d;
-  --sd-bg-page: #0f1522;
-  --sd-bg-shell: #0c111d;
-  --sd-bg-sidebar: #090e18;
-  --sd-bg-elevated: #151d2b;
-  --sd-bg-control: #1c2636;
-  --sd-bg-control-hover: #253246;
-  --sd-bg-hover: rgba(255, 255, 255, 0.08);
+
+  --sd-bg-app: #07090f;
+  --sd-bg-page: #080b12;
+  --sd-bg-shell: #080b12;
+  --sd-bg-sidebar: #0b0e16;
+  --sd-bg-elevated: #0f131c;
+  --sd-bg-elevated-soft: #121722;
+  --sd-bg-elevated-muted: #161c28;
+  --sd-bg-elevated-tint: rgba(15, 19, 28, 0.82);
+  --sd-bg-control: #151b26;
+  --sd-bg-control-hover: #1b2330;
+  --sd-bg-hover: rgba(255, 255, 255, 0.055);
   --sd-bg-selected: var(--sd-primary-soft);
   --sd-bg-selected-strong: var(--sd-primary-soft-strong);
-  --sd-text-primary: #f8fafc;
-  --sd-text-secondary: #cbd5e1;
-  --sd-text-muted: rgba(203, 213, 225, 0.64);
-  --sd-text-inverse: #ffffff;
-  --sd-border: rgba(148, 163, 184, 0.22);
-  --sd-border-soft: rgba(148, 163, 184, 0.13);
-  --sd-scrollbar-thumb: rgba(203, 213, 225, 0.38);
-  --sd-scrollbar-thumb-hover: rgba(203, 213, 225, 0.5);
-  --sd-bg-elevated-soft: #151d2d;
-  --sd-bg-elevated-muted: #161f30;
-  --sd-bg-elevated-tint: rgba(24, 33, 51, 0.92);
-  --sd-text-inverse-soft: rgba(255, 255, 255, 0.9);
-  --sd-text-inverse-muted: rgba(255, 255, 255, 0.7);
-  --sd-overlay: rgba(2, 6, 23, 0.54);
-  --sd-shadow-floating: 0 12px 34px rgba(2, 6, 23, 0.36);
-  --sd-shadow-panel: 0 10px 28px rgba(2, 6, 23, 0.28);
-  --sd-shadow-drawer: -18px 0 42px rgba(2, 6, 23, 0.42);
+
+  --sd-text-primary: #f2f5fa;
+  --sd-text-secondary: #a5afc0;
+  --sd-text-muted: #6d7788;
+  --sd-text-inverse: #0b0e15;
+  --sd-text-inverse-soft: rgba(242, 245, 250, 0.72);
+  --sd-text-inverse-muted: rgba(242, 245, 250, 0.46);
+
+  --sd-border: #1e2531;
+  --sd-border-soft: #171d27;
+  --sd-border-sidebar: #1a212c;
+
+  --sd-bg-sidebar-hover: rgba(255, 255, 255, 0.05);
+  --sd-bg-sidebar-pressed: rgba(255, 255, 255, 0.08);
+  --sd-bg-sidebar-selected: color-mix(in srgb, var(--sd-primary) 16%, transparent);
+  --sd-bg-sidebar-selected-strong: color-mix(in srgb, var(--sd-primary) 24%, transparent);
+
+  --sd-shadow-floating: 0 1px 2px rgba(0, 0, 0, 0.5), 0 16px 40px -16px rgba(0, 0, 0, 0.7);
+  --sd-shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -18px rgba(0, 0, 0, 0.6);
+  --sd-shadow-drawer: -24px 0 64px rgba(0, 0, 0, 0.6);
+
+  --sd-overlay: rgba(2, 4, 8, 0.64);
+  --sd-scrollbar-thumb: rgba(255, 255, 255, 0.14);
+  --sd-scrollbar-thumb-hover: rgba(255, 255, 255, 0.24);
+
+  --qq-text_primary_light: rgba(242, 245, 250, 0.64);
+  --qq-text_secondary: rgba(242, 245, 250, 0.54);
 }
 
 *,
@@ -214,19 +230,32 @@ body {
   margin: 0;
   background: var(--sd-bg-app);
   color: var(--sd-text-primary);
-  font-family:
-    'PingFang SC', 'Helvetica Neue', 'Hiragino Sans GB', 'Segoe UI', 'Microsoft YaHei', '微软雅黑',
-    sans-serif;
+  font-family: var(--sd-font-sans);
   font-size: 14px;
   line-height: 1.6;
+  font-feature-settings: 'cv11', 'ss01';
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* 中西混排间距交由渲染层承担：按 CLREQ 补入四分之一汉字宽的间隙，
-     且不写入文本内容，复制和搜索都不会带上多余空格。
-     浏览器计算值默认为 no-autospace，必须显式声明才生效。
-     不支持该属性的浏览器只是拿不到间隙，属于渐进增强。 */
   text-autospace: normal;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+/* 数字统一等宽，表格与指标列不会随数值变化而跳动。 */
+.sd-num,
+.n-statistic .n-statistic-value,
+.n-data-table td,
+.n-data-table th {
+  font-variant-numeric: tabular-nums;
 }
 
 .sd-code-text,
@@ -238,10 +267,6 @@ body {
   font-family: var(--sd-font-code);
 }
 
-/* 等宽块按字符对齐，自动间距会破坏对齐；海豹码与豹语变量含汉字，
-   补空格还会改变视觉宽度，故在这些容器内部关闭。
-   注意只关容器内部：给行内 code 本身声明 no-autospace 会连带取消
-   它与前后中文之间的边界间隙，而那个间隙正是需要保留的。 */
 .sd-code-text input,
 .sd-code-text textarea,
 .sd-code-text pre,
@@ -252,6 +277,7 @@ samp {
   text-autospace: no-autospace;
 }
 
+/* 主题切换：只过渡颜色，避免布局抖动 */
 html.sd-theme-transition-disabled *,
 html.sd-theme-transition-disabled *::before,
 html.sd-theme-transition-disabled *::after {
@@ -262,28 +288,13 @@ html.sd-theme-transitioning,
 html.sd-theme-transitioning body,
 html.sd-theme-transitioning body * {
   transition-property: color, background-color, border-color, box-shadow, fill, stroke;
-  transition-duration: 440ms;
+  transition-duration: 420ms;
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-html.sd-theme-transitioning::after {
-  position: fixed;
-  z-index: 2147483647;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    var(--sd-primary) 0%,
-    transparent 46%,
-    var(--sd-bg-elevated) 100%
-  );
-  content: '';
-  pointer-events: none;
-  animation: sd-theme-gradient-wash 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 html.sd-theme-view-transitioning::view-transition-old(root),
 html.sd-theme-view-transitioning::view-transition-new(root) {
-  animation-duration: 500ms;
+  animation-duration: 460ms;
   animation-fill-mode: both;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   mix-blend-mode: normal;
@@ -295,22 +306,6 @@ html.sd-theme-view-transitioning::view-transition-old(root) {
 
 html.sd-theme-view-transitioning::view-transition-new(root) {
   animation-name: sd-theme-fade-in;
-}
-
-@keyframes sd-theme-gradient-wash {
-  0% {
-    opacity: 0;
-    transform: translateX(-1.5%);
-  }
-
-  45% {
-    opacity: 0.14;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateX(1.5%);
-  }
 }
 
 @keyframes sd-theme-fade-out {
@@ -352,38 +347,28 @@ select {
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track-piece {
-  background: var(--sd-bg-page);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: var(--sd-radius-pill);
   background: var(--sd-scrollbar-thumb);
-}
-
-::-webkit-scrollbar-corner {
-  background: var(--sd-bg-page);
-}
-
-::-webkit-scrollbar-thumb:window-inactive {
-  background: var(--sd-border);
+  background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--sd-scrollbar-thumb-hover);
+  background-clip: content-box;
 }
 
-@supports (color: color-mix(in srgb, white, black)) {
-  ::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--sd-text-muted), transparent 40%);
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in srgb, var(--sd-text-muted), transparent 20%);
-  }
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .no-scrollbar {
@@ -400,10 +385,9 @@ select {
   justify-content: center;
 }
 
-/*
- * Page-level vertical rhythm: every page root uses this stack so the gap
- * between the page header and each top-level section is a single token.
- */
+/* ------------------------------------------------------------------
+ * 页面垂直节奏
+ * ------------------------------------------------------------------ */
 .sd-page {
   display: flex;
   flex-direction: column;
@@ -411,16 +395,12 @@ select {
   min-width: 0;
 }
 
-/* When a page wraps its top-level sections in a single <n-spin>, make the
- * spin content a stack with the same page-level gap so spacing stays uniform. */
 .sd-page > .n-spin-container > .n-spin-content {
   display: flex;
   flex-direction: column;
   gap: var(--sd-space-lg);
 }
 
-/* Tab panes on regular pages are also page-level stacks: keep the same
- * vertical rhythm between every block they contain (filter, panel, etc.). */
 .sd-page .n-tab-pane {
   display: flex;
   flex-direction: column;
@@ -446,8 +426,6 @@ select {
   padding-top: var(--sd-page-section-gap);
 }
 
-/* 少量短标签在空间不足时横向滚动，不压缩、不换行。分类较多或数量动态时使用
-   ResponsiveTabs，在窄容器中改用选择器。 */
 .sd-scrollable-tabs .n-tabs-nav-scroll-content {
   min-width: max-content;
   justify-content: flex-start !important;
@@ -457,6 +435,102 @@ select {
   flex: none;
 }
 
+/* ------------------------------------------------------------------
+ * 通用表面与文字
+ * ------------------------------------------------------------------ */
+.sd-surface {
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius-lg);
+  background: var(--sd-bg-elevated);
+}
+
+.sd-eyebrow {
+  color: var(--sd-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 560;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sd-hint {
+  color: var(--sd-text-muted);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+/* 顶部一条极淡的渐变，给深色壳层一点空间纵深。 */
+.sd-ambient-glow {
+  position: fixed;
+  z-index: 0;
+  top: -320px;
+  left: 50%;
+  width: 760px;
+  height: 620px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--sd-primary) 12%, transparent) 0%,
+    transparent 68%
+  );
+  filter: blur(24px);
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+/* ------------------------------------------------------------------
+ * 表格：统一表头、行高与分隔线，避免各页各自收紧
+ * ------------------------------------------------------------------ */
+.n-data-table .n-data-table-th {
+  background: transparent;
+  color: var(--sd-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 520;
+  letter-spacing: 0.02em;
+}
+
+.n-data-table .n-data-table-td {
+  font-size: 0.8125rem;
+}
+
+.n-data-table .n-data-table-tr:hover .n-data-table-td {
+  background: var(--sd-bg-hover);
+}
+
+.n-data-table .n-data-table-empty {
+  padding: 2.5rem 1rem;
+}
+
+/* ------------------------------------------------------------------
+ * 标签页：统一左对齐、细指示条与紧凑字号
+ * ------------------------------------------------------------------ */
+.n-tabs .n-tabs-nav--line-type .n-tabs-nav-scroll-content {
+  border-bottom: 1px solid var(--sd-border-soft);
+}
+
+.n-tabs .n-tabs-tab {
+  color: var(--sd-text-muted);
+  font-size: 0.8125rem;
+  transition: color var(--sd-transition-fast);
+}
+
+.n-tabs .n-tabs-tab:hover {
+  color: var(--sd-text-secondary);
+}
+
+.n-tabs .n-tabs-tab.n-tabs-tab--active {
+  color: var(--sd-text-primary);
+  font-weight: 560;
+}
+
+.n-tabs .n-tabs-bar {
+  height: 2px;
+  border-radius: 2px;
+  background: var(--sd-primary);
+}
+
+/* ------------------------------------------------------------------
+ * Naive UI 细节修正
+ * ------------------------------------------------------------------ */
 .the-dialog.n-card,
 .the-dialog .n-card,
 .feed-modal.n-card,
@@ -465,8 +539,6 @@ select {
   max-width: calc(100vw - 32px);
 }
 
-/* naive-ui 的 tooltip 默认按内容撑宽，长文本会超出视口且内容被裁切。
-   统一限制浮层尺寸，文本换行，纵向超出时在内容区滚动。 */
 .n-popover.n-tooltip {
   max-width: min(520px, calc(100vw - 32px));
 }
@@ -475,4 +547,10 @@ select {
   max-height: calc(100vh - 48px);
   overflow-y: auto;
   overflow-wrap: anywhere;
+}
+
+/* 输入类控件聚焦时统一给一圈柔和光环，替代默认的硬描边。 */
+.n-input.n-input--focus .n-input__border,
+.n-base-selection.n-base-selection--focus .n-base-selection__border {
+  box-shadow: 0 0 0 3px var(--sd-primary-soft);
 }

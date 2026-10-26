@@ -64,4 +64,13 @@ export default defineConfigWithVueTs(
       'vue/multi-word-component-names': 'off',
     },
   },
+
+  {
+    // Vue Bits / Inspira UI 以单文件源码形式引入，组件名保持上游命名。
+    name: 'app/vendor-motion-components',
+    files: ['src/components/bits/**/*.vue', 'src/components/inspira/**/*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
 )

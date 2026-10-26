@@ -98,29 +98,15 @@ const props = defineProps<{
   border-radius: var(--sd-radius-lg);
   background:
     radial-gradient(
-      circle at 12% 16%,
-      color-mix(in srgb, var(--sd-primary) 18%, transparent),
-      transparent 33%
+      circle at 6% 0%,
+      color-mix(in srgb, var(--sd-primary) 7%, transparent),
+      transparent 42%
     ),
-    radial-gradient(
-      circle at 96% 8%,
-      color-mix(in srgb, var(--sd-primary) 8%, transparent),
-      transparent 26%
-    ),
-    linear-gradient(142deg, var(--sd-bg-elevated), var(--sd-bg-elevated-soft));
+    var(--sd-bg-elevated);
   isolation: isolate;
 }
 
-.about-hero::after {
-  position: absolute;
-  z-index: -1;
-  width: 280px;
-  height: 280px;
-  border: 1px solid color-mix(in srgb, var(--sd-primary) 12%, transparent);
-  border-radius: 50%;
-  content: '';
-  inset: -150px -70px auto auto;
-}
+
 
 .about-hero__mascot {
   display: grid;
@@ -139,7 +125,7 @@ const props = defineProps<{
   border-radius: var(--sd-radius-lg);
   background:
     radial-gradient(circle at 50% 34%, var(--sd-bg-elevated) 0 23%, transparent 58%),
-    linear-gradient(155deg, var(--sd-primary-soft-strong), var(--sd-primary-soft));
+    linear-gradient(155deg, var(--sd-bg-elevated-soft), var(--sd-primary-soft));
   animation: about-mascot-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -174,9 +160,9 @@ const props = defineProps<{
 .about-hero h1 {
   margin: 0;
   color: var(--sd-text-primary);
-  font-size: clamp(38px, 5vw, 56px);
-  font-weight: 850;
-  letter-spacing: -0.045em;
+  font-size: clamp(32px, 4vw, 44px);
+  font-weight: 680;
+  letter-spacing: -0.04em;
   line-height: 1;
 }
 
@@ -186,7 +172,7 @@ const props = defineProps<{
   overflow: hidden;
   border: 1px solid var(--sd-border-soft);
   border-radius: var(--sd-radius-md);
-  background: color-mix(in srgb, var(--sd-bg-elevated) 76%, transparent);
+  background: var(--sd-bg-elevated-soft);
   transition: opacity var(--sd-transition-base);
 }
 

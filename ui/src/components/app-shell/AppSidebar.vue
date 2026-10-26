@@ -1,53 +1,102 @@
 <template>
-  <div class="sd-sidebar-content">
+  <div class="sd-sidebar-content" :class="{ 'is-collapsed': props.collapsed }">
     <AppSidebarBrand
       :collapsed="props.collapsed"
       @enable-advanced-config="emit('enableAdvancedConfig')"
     />
-    <n-menu
-      class="sd-sidebar-menu"
-      :collapsed="props.collapsed"
-      :collapsed-width="64"
-      :icon-size="20"
-      :collapsed-icon-size="20"
-      :options="options"
-      :value="activeValue"
-      :expanded-keys="expandedKeys"
-      :expand-icon="expandIcon"
-      accordion
-      @update:expanded-keys="expandedKeys = $event"
-      @update:value="handleMenuSelect"
-    />
-    <footer class="sd-sidebar-footer" :class="{ 'sd-sidebar-footer--collapsed': props.collapsed }">
+
+    <nav class="sd-nav no-scrollbar" aria-label="主导航">
+      <template v-for="item in navigationTree" :key="item.path ?? item.label">
+        <div v-if="item.children?.length" class="sd-nav-group">
+          <button
+            v-if="!props.collapsed"
+            type="button"
+            class="sd-nav-group__toggle"
+            :aria-expanded="isGroupOpen(item)"
+            @click="toggleGroup(item.label)"
+          >
+            <span>{{ item.label }}</span>
+            <i-tabler-chevron-down
+              class="sd-nav-group__chevron"
+              :class="{ 'is-open': isGroupOpen(item) }"
+            />
+          </button>
+          <div v-else class="sd-nav-group__rule" aria-hidden="true" />
+
+          <div v-show="props.collapsed || isGroupOpen(item)" class="sd-nav-group__items">
+            <template v-for="child in item.children" :key="child.path ?? child.label">
+              <n-tooltip
+                v-if="child.path"
+                :disabled="!props.collapsed"
+                placement="right"
+                :delay="200"
+              >
+                <template #trigger>
+                  <RouterLink
+                    :to="child.path"
+                    class="sd-nav-item"
+                    :class="{ 'is-active': isActive(child.path) }"
+                    :aria-current="isActive(child.path) ? 'page' : undefined"
+                  >
+                    <span class="sd-nav-item__icon">
+                      <AppNavigationIcon :name="child.icon" />
+                    </span>
+                    <span v-if="!props.collapsed" class="sd-nav-item__label">{{
+                      child.label
+                    }}</span>
+                  </RouterLink>
+                </template>
+                {{ child.label }}
+              </n-tooltip>
+              <span v-else class="sd-nav-item sd-nav-item--static">
+                <span class="sd-nav-item__icon">
+                  <AppNavigationIcon :name="child.icon" />
+                </span>
+                <span v-if="!props.collapsed" class="sd-nav-item__label">{{ child.label }}</span>
+              </span>
+            </template>
+          </div>
+        </div>
+
+        <n-tooltip v-else :disabled="!props.collapsed" placement="right" :delay="200">
+          <template #trigger>
+            <RouterLink
+              :to="item.path ?? '/'"
+              class="sd-nav-item sd-nav-item--top"
+              :class="{ 'is-active': item.path ? isActive(item.path) : false }"
+              :aria-current="item.path && isActive(item.path) ? 'page' : undefined"
+            >
+              <span class="sd-nav-item__icon">
+                <AppNavigationIcon :name="item.icon" />
+              </span>
+              <span v-if="!props.collapsed" class="sd-nav-item__label">{{ item.label }}</span>
+            </RouterLink>
+          </template>
+          {{ item.label }}
+        </n-tooltip>
+      </template>
+    </nav>
+
+    <footer class="sd-sidebar-footer">
       <n-tooltip :disabled="!props.collapsed" placement="right">
         <template #trigger>
-          <n-button
-            tag="a"
-            quaternary
-            class="sd-sidebar-footer-action"
-            aria-label="旧版 UI"
-            :href="oldUIUrl"
-          >
-            <template #icon>
-              <n-icon><i-tabler-history /></n-icon>
-            </template>
+          <a class="sd-sidebar-action" aria-label="旧版 UI" :href="oldUIUrl">
+            <i-tabler-history class="sd-sidebar-action__icon" />
             <span v-if="!props.collapsed">旧版 UI</span>
-          </n-button>
+          </a>
         </template>
-        旧版 UI
+        切换回旧版界面
       </n-tooltip>
     </footer>
   </div>
 </template>
 
-<script setup lang="tsx">
-import { computed, h, ref, watch } from 'vue';
-import { RouterLink, useRoute, useRouter } from 'vue-router';
-import type { MenuOption } from 'naive-ui';
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue';
+import { RouterLink, useRoute } from 'vue-router';
 import { resolveSwitchToOldUIUrl } from '@/api/config';
 import AppNavigationIcon from './AppNavigationIcon.vue';
 import AppSidebarBrand from './AppSidebarBrand.vue';
-import { getNavigationExpandedKeys, resolveMenuNavigationTarget } from '@/router/navigationModel';
 import type { NavigationItem } from '@/router/types';
 import { useAppNavigation } from '@/router/useAppNavigation';
 
@@ -67,43 +116,9 @@ const emit = defineEmits<{
 }>();
 
 const route = useRoute();
-const router = useRouter();
 const oldUIUrl =
   typeof window !== 'undefined' ? resolveSwitchToOldUIUrl(window.location) : '/?ui=old';
 const { navigationTree } = useAppNavigation(() => props.advancedConfigCounter);
-const expandedKeys = ref<string[]>([]);
-
-function link(path: string, label: string) {
-  return () => h(RouterLink, { to: path, class: 'sd-menu-link' }, () => label);
-}
-
-function icon(name?: string) {
-  if (!name) return undefined;
-  return () => (
-    <n-icon>
-      <AppNavigationIcon name={name} />
-    </n-icon>
-  );
-}
-
-function expandIcon() {
-  return (
-    <n-icon>
-      <i-tabler-chevron-right />
-    </n-icon>
-  );
-}
-
-function toMenuOption(item: NavigationItem): MenuOption {
-  return {
-    key: item.path ?? item.label,
-    label: item.path ? link(item.path, item.label) : item.label,
-    icon: icon(item.icon),
-    children: item.children?.map(toMenuOption),
-  };
-}
-
-const options = computed<MenuOption[]>(() => navigationTree.value.map(toMenuOption));
 
 function normalizePath(path: string) {
   try {
@@ -113,22 +128,39 @@ function normalizePath(path: string) {
   }
 }
 
-const activeValue = computed(() => {
-  return normalizePath(route.path);
-});
+const currentPath = computed(() => normalizePath(route.path));
 
-function handleMenuSelect(key: string) {
-  const target = resolveMenuNavigationTarget(key, route.path, props.collapsed);
-  if (target) void router.push(target);
+function isActive(path: string) {
+  if (path === '/') return currentPath.value === '/';
+  return currentPath.value === path || currentPath.value.startsWith(`${path}/`);
 }
 
-watch(
-  [navigationTree, () => route.path],
-  () => {
-    expandedKeys.value = getNavigationExpandedKeys(navigationTree.value, route.path);
-  },
-  { immediate: true }
-);
+function containsActive(item: NavigationItem): boolean {
+  return Boolean(
+    item.children?.some(child => (child.path ? isActive(child.path) : containsActive(child)))
+  );
+}
+
+// 动态分类分组默认收起，避免把侧栏撑成一整屏；当前所在分组始终展开。
+const overrides = ref<Record<string, boolean>>({});
+
+function isGroupOpen(item: NavigationItem) {
+  const override = overrides.value[item.label];
+  if (override !== undefined) return override;
+  if (containsActive(item)) return true;
+  return item.dynamicChildren !== 'customTextCategories';
+}
+
+function toggleGroup(label: string) {
+  const item = navigationTree.value.find(entry => entry.label === label);
+  if (!item) return;
+  overrides.value = { ...overrides.value, [label]: !isGroupOpen(item) };
+}
+
+// 路由变化时让目标分组重新参与默认展开判断。
+watch(currentPath, () => {
+  overrides.value = {};
+});
 </script>
 
 <style scoped>
@@ -140,135 +172,212 @@ watch(
   text-align: left;
 }
 
-.sd-sidebar-menu {
+.sd-nav {
+  display: flex;
   flex: 1 1 auto;
   min-height: 0;
+  flex-direction: column;
+  gap: 1.15rem;
   overflow-y: auto;
-  background: transparent;
-  padding: 0 0.6rem 1rem;
+  overscroll-behavior: contain;
+  padding: 0.75rem 0.7rem 1rem;
   scrollbar-width: none;
-  transition: padding-inline var(--sd-transition-base);
 }
 
-.sd-sidebar-menu::-webkit-scrollbar {
+.sd-nav::-webkit-scrollbar {
   display: none;
 }
 
-.sd-sidebar-footer {
-  display: grid;
-  flex: 0 0 auto;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.4rem;
-  margin-top: auto;
-  border-top: 1px solid var(--sd-border-sidebar);
-  background: var(--sd-bg-sidebar);
-  padding: 0.65rem;
-  transition: padding var(--sd-transition-base);
+.sd-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
-.sd-sidebar-footer--collapsed {
-  grid-template-columns: 1fr;
-  justify-items: center;
-  padding: 0.55rem 0;
-}
-
-.sd-sidebar-footer-action {
-  --n-color-focus: var(--sd-bg-sidebar-hover) !important;
-  --n-color-hover: var(--sd-bg-sidebar-hover) !important;
-  --n-color-pressed: var(--sd-bg-sidebar-pressed) !important;
-  --n-text-color: var(--sd-text-inverse-soft) !important;
-  --n-text-color-focus: var(--sd-text-inverse) !important;
-  --n-text-color-hover: var(--sd-text-inverse) !important;
-  --n-text-color-pressed: var(--sd-text-inverse) !important;
+.sd-nav-group__toggle {
+  display: flex;
   width: 100%;
-  min-width: 0;
-  color: var(--sd-text-inverse-soft);
-  font-size: 0.78rem;
-}
-
-.sd-sidebar-footer-action:hover {
-  color: var(--sd-text-inverse);
-}
-
-.sd-sidebar-footer--collapsed .sd-sidebar-footer-action {
-  width: 40px;
-  padding-inline: 0;
-}
-
-:deep(.sd-sidebar-menu.n-menu--collapsed) {
-  padding-inline: 0;
-}
-
-:deep(.sd-menu-link) {
-  display: inline-flex;
   align-items: center;
-  color: inherit;
-  text-decoration: none;
-  text-align: left;
-  width: 100%;
-  line-height: 1.2;
-}
-
-:deep(.sd-sidebar-menu .n-menu-item-content) {
-  border-radius: var(--sd-radius-sm);
-  transition:
-    background-color var(--sd-transition-fast),
-    color var(--sd-transition-fast),
-    box-shadow var(--sd-transition-fast);
-}
-
-:deep(.sd-sidebar-menu .n-menu-item-content--selected) {
-  box-shadow: none;
-}
-
-:deep(.sd-sidebar-menu > .n-menu-item > .n-menu-item-content--selected::before),
-:deep(.sd-sidebar-menu > .n-submenu > .n-menu-item > .n-menu-item-content--child-active::before) {
-  box-shadow: inset 3px 0 var(--sd-primary);
-}
-
-:deep(.sd-sidebar-menu > .n-submenu > .n-menu-item > .n-menu-item-content--child-active::before) {
-  background-color: transparent;
-}
-
-:deep(.sd-sidebar-menu .n-menu-item-content__icon .n-icon) {
-  font-size: 18px;
+  justify-content: space-between;
+  border: 0;
+  background: transparent;
+  color: var(--sd-text-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.6875rem;
+  font-weight: 560;
+  letter-spacing: 0.08em;
   line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transform: translateY(-0.5px);
+  padding: 0 0.65rem 0.45rem;
+  text-align: left;
+  transition: color var(--sd-transition-fast);
 }
 
-:deep(.sd-sidebar-menu.n-menu .n-menu-item-content .n-menu-item-content__arrow) {
-  transform: rotate(90deg);
+.sd-nav-group__toggle:hover {
+  color: var(--sd-text-secondary);
 }
 
-:deep(
-  .sd-sidebar-menu.n-menu
-    .n-menu-item-content.n-menu-item-content--collapsed
-    .n-menu-item-content__arrow
-) {
+.sd-nav-group__chevron {
+  font-size: 13px;
+  opacity: 0.7;
+  transform: rotate(-90deg);
+  transition: transform var(--sd-transition-fast);
+}
+
+.sd-nav-group__chevron.is-open {
   transform: rotate(0deg);
 }
 
-:deep(.sd-sidebar-menu .n-menu-item-content-header) {
+.sd-nav-group__items {
   display: flex;
-  align-items: center;
-  min-height: 20px;
-  text-align: left;
-  line-height: 1.2;
+  flex-direction: column;
+  gap: 1px;
 }
 
-:deep(.sd-sidebar-menu .n-menu-item-content-header a) {
+.sd-nav-group__rule {
+  height: 1px;
+  margin: 0.2rem 0.5rem 0.55rem;
+  background: var(--sd-border-soft);
+}
+
+.sd-nav-item {
+  position: relative;
+  display: flex;
+  height: 34px;
+  align-items: center;
+  border-radius: var(--sd-radius-md);
+  color: var(--sd-text-secondary);
+  gap: 0.6rem;
+  padding: 0 0.65rem;
+  text-decoration: none;
+  transition:
+    background-color var(--sd-transition-fast),
+    color var(--sd-transition-fast);
+}
+
+.sd-nav-item--top {
+  height: 36px;
+  margin-bottom: 0.15rem;
+}
+
+.sd-nav-item__icon {
   display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
   align-items: center;
-  min-height: 20px;
-  line-height: 20px;
+  justify-content: center;
+  color: var(--sd-text-muted);
+  font-size: 17px;
+  transition: color var(--sd-transition-fast);
 }
 
-:deep(.sd-sidebar-menu .n-menu-item-group-title) {
-  height: 22px;
-  font-size: 0.72rem;
-  opacity: 0.72;
+.sd-nav-item__label {
+  overflow: hidden;
+  flex: 1 1 auto;
+  font-size: 0.8125rem;
+  font-weight: 450;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sd-nav-item:hover {
+  background: var(--sd-bg-sidebar-hover);
+  color: var(--sd-text-primary);
+}
+
+.sd-nav-item:hover .sd-nav-item__icon {
+  color: var(--sd-text-secondary);
+}
+
+.sd-nav-item.is-active {
+  background: var(--sd-bg-sidebar-selected);
+  color: var(--sd-text-primary);
+  font-weight: 520;
+}
+
+.sd-nav-item.is-active .sd-nav-item__icon {
+  color: var(--sd-primary);
+}
+
+.sd-nav-item.is-active::before {
+  position: absolute;
+  top: 50%;
+  left: -0.7rem;
+  width: 2px;
+  height: 15px;
+  border-radius: 2px;
+  background: var(--sd-primary);
+  content: '';
+  transform: translateY(-50%);
+}
+
+.sd-nav-item--static {
+  cursor: default;
+}
+
+.sd-sidebar-footer {
+  display: flex;
+  flex: 0 0 auto;
+  padding: 0.55rem 0.7rem 0.75rem;
+}
+
+.sd-sidebar-action {
+  display: flex;
+  width: 100%;
+  height: 34px;
+  align-items: center;
+  border-radius: var(--sd-radius-md);
+  color: var(--sd-text-muted);
+  gap: 0.6rem;
+  padding: 0 0.65rem;
+  text-decoration: none;
+  transition:
+    background-color var(--sd-transition-fast),
+    color var(--sd-transition-fast);
+}
+
+.sd-sidebar-action:hover {
+  background: var(--sd-bg-sidebar-hover);
+  color: var(--sd-text-secondary);
+}
+
+.sd-sidebar-action__icon {
+  flex: 0 0 auto;
+  font-size: 17px;
+}
+
+.sd-sidebar-action span {
+  font-size: 0.78rem;
+}
+
+.is-collapsed .sd-nav {
+  align-items: center;
+  padding-inline: 0.4rem;
+}
+
+.is-collapsed .sd-nav-group {
+  align-items: center;
+  width: 100%;
+}
+
+.is-collapsed .sd-nav-item {
+  justify-content: center;
+  padding: 0;
+}
+
+.is-collapsed .sd-nav-item.is-active::before {
+  left: -0.4rem;
+}
+
+.is-collapsed .sd-sidebar-footer {
+  justify-content: center;
+  padding-inline: 0.35rem;
+}
+
+.is-collapsed .sd-sidebar-action {
+  justify-content: center;
+  padding: 0;
 }
 </style>

@@ -87,9 +87,9 @@ function handleScroll() {
   min-height: 0;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--sd-border-soft);
-  border-radius: var(--sd-radius-md);
-  background: var(--sd-bg-page);
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius-lg);
+  background: var(--sd-bg-elevated);
 }
 
 .tool-test-chat-window__header {
@@ -99,7 +99,7 @@ function handleScroll() {
   gap: 0.75rem;
   padding: 0.55rem 0.75rem;
   border-bottom: 1px solid var(--sd-border-soft);
-  background: color-mix(in srgb, var(--sd-bg-elevated), transparent 8%);
+  background: var(--sd-bg-elevated-soft);
 }
 
 .tool-test-chat-window__title {

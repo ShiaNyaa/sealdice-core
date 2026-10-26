@@ -43,7 +43,14 @@ const emit = defineEmits<{
 <style scoped>
 .base-setting-search {
   position: relative;
-  margin-bottom: var(--sd-space-md);
+  width: min(100%, 460px);
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 720px) {
+  .base-setting-search {
+    width: 100%;
+  }
 }
 
 .search-result-card {

@@ -114,13 +114,19 @@
         </n-flex>
       </n-flex>
 
-      <n-empty v-if="!editor.hasCategory.value" description="未找到当前文案分类" />
+      <ListEmptyState
+        v-if="!editor.hasCategory.value"
+        description="未找到当前文案分类"
+        bordered
+      />
 
-      <n-empty v-else-if="editor.sortedCategory.value.length === 0" description="没有匹配的文案">
-        <template #extra>
-          <n-button size="small" @click="editor.clearFilters">清除筛选</n-button>
-        </template>
-      </n-empty>
+      <ListEmptyState
+        v-else-if="editor.sortedCategory.value.length === 0"
+        description="没有匹配的文案"
+        bordered
+      >
+        <n-button size="small" @click="editor.clearFilters">清除筛选</n-button>
+      </ListEmptyState>
 
       <n-collapse v-else class="text-collapse" :default-expanded-names="['__others__']">
         <n-collapse-item
@@ -168,6 +174,7 @@
 
 <script setup lang="ts">
 import HelpCollapse from '@/components/shared/HelpCollapse.vue';
+import ListEmptyState from '@/components/shared/ListEmptyState.vue';
 import type { CustomTextFilterMode } from '@/features/customText/viewModel';
 import CustomTextEntryCard from '@/components/custom-text/CustomTextEntryCard.vue';
 import CustomTextImportModal from '@/components/custom-text/CustomTextImportModal.vue';

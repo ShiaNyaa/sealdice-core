@@ -1,9 +1,8 @@
 <template>
   <div class="test-mode-frame" :class="{ 'test-mode-frame--active': active }">
-    <div v-if="active" class="test-mode-frame__banner">
-      <TipBox type="warning">
-        {{ bannerText }}
-      </TipBox>
+    <div v-if="active" class="test-mode-frame__banner" role="status">
+      <i-tabler-eye-exclamation class="test-mode-frame__banner-icon" aria-hidden="true" />
+      <span>{{ bannerText }}</span>
     </div>
     <div v-if="active" class="test-mode-frame__watermark" aria-hidden="true">
       <span v-for="row in watermarkRows" :key="row" class="test-mode-frame__watermark-row">
@@ -18,7 +17,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import TipBox from '@/components/shared/TipBox.vue';
 
 const props = defineProps<{
   active: boolean;
@@ -48,9 +46,22 @@ const watermarkRows = computed(() => {
 
 .test-mode-frame__banner {
   position: sticky;
+  z-index: 60;
   top: 0;
-  z-index: 30;
-  padding: 0.75rem 0.75rem 0;
+  display: flex;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--sd-warning) 22%, transparent);
+  background: color-mix(in srgb, var(--sd-warning) 13%, var(--sd-bg-app));
+  color: var(--sd-warning);
+  font-size: 0.75rem;
+  gap: 0.4rem;
+  letter-spacing: 0.01em;
+}
+
+.test-mode-frame__banner-icon {
+  font-size: 14px;
 }
 
 .test-mode-frame__watermark {
@@ -77,7 +88,8 @@ const watermarkRows = computed(() => {
 
 @media (max-width: 767.9px) {
   .test-mode-frame__banner {
-    padding: 0.5rem 0.5rem 0;
+    height: 28px;
+    font-size: 0.6875rem;
   }
 
   .test-mode-frame__watermark {

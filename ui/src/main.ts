@@ -8,6 +8,9 @@ import { VueQueryPlugin } from '@tanstack/vue-query';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import relativeTime from 'dayjs/plugin/relativeTime';
+// Geist 只覆盖拉丁字形与数字，中文由 base.css 的字族回退链接管。
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
 import safeHtmlDirective from './directives/safeHtml';
 import {
   create,
@@ -34,9 +37,6 @@ import { queryClient } from './queryClient';
 // 2. Naive UI 所需的运行时补丁；
 // 3. OpenAPI axios client、router、Vue Query。
 // 业务初始化不要放在这里，优先放进布局或 feature composable，便于测试和按页面加载。
-
-// 引入字体: 通用字体 / 等宽字体
-import 'vfonts/Lato.css';
 
 // 配置 dayjs
 dayjs.locale('zh-cn');

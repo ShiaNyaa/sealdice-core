@@ -29,11 +29,11 @@ withDefaults(
 <style scoped>
 .setting-row {
   display: grid;
-  grid-template-columns: minmax(13rem, 18rem) minmax(13rem, 26rem);
+  grid-template-columns: minmax(12rem, 17rem) minmax(12rem, 24rem);
   align-items: center;
   gap: var(--sd-space-lg);
-  min-height: 2.75rem;
-  padding: var(--sd-space-xs) var(--sd-space-md);
+  min-height: 3rem;
+  padding: 0.4rem 0.85rem;
   border-radius: var(--sd-radius-sm);
   transition: background-color 0.16s ease;
 }
@@ -63,7 +63,7 @@ withDefaults(
 
 .setting-row-label {
   color: var(--sd-text-primary);
-  font-size: 0.92rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.45;
 }
@@ -71,8 +71,8 @@ withDefaults(
 .setting-row-description {
   margin: 0.12rem 0 0;
   color: var(--sd-text-muted);
-  font-size: 0.78rem;
-  line-height: 1.4;
+  font-size: 0.75rem;
+  line-height: 1.45;
 }
 
 .setting-row-control {

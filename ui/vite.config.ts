@@ -27,6 +27,41 @@ const apiProxyTarget = (
   DEFAULT_PROXY_TARGET
 ).trim();
 
+// 开发与 preview 共用同一组代理规则。
+const apiProxy = {
+  '^/old-ui(?:/.*)?$': {
+    target: apiProxyTarget,
+    changeOrigin: true,
+    xfwd: true,
+  },
+  '^/api': {
+    target: apiProxyTarget,
+    changeOrigin: true,
+    xfwd: true,
+  },
+  '^/sd-api': {
+    target: apiProxyTarget,
+    changeOrigin: true,
+    ws: true,
+    xfwd: true,
+  },
+  '^/openapi.json$': {
+    target: apiProxyTarget,
+    changeOrigin: true,
+    xfwd: true,
+  },
+  '^/docs(?:/.*)?$': {
+    target: apiProxyTarget,
+    changeOrigin: true,
+    xfwd: true,
+  },
+  '^/schemas(?:/.*)?$': {
+    target: apiProxyTarget,
+    changeOrigin: true,
+    xfwd: true,
+  },
+};
+
 export default defineConfig(({ mode }) => {
   const plugins: PluginOption[] = [
     resourceBudget(),
@@ -172,39 +207,12 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
       port: 5175,
       strictPort: true,
-      proxy: {
-        '^/old-ui(?:/.*)?$': {
-          target: apiProxyTarget,
-          changeOrigin: true,
-          xfwd: true,
-        },
-        '^/api': {
-          target: apiProxyTarget,
-          changeOrigin: true,
-          xfwd: true,
-        },
-        '^/sd-api': {
-          target: apiProxyTarget,
-          changeOrigin: true,
-          ws: true,
-          xfwd: true,
-        },
-        '^/openapi.json$': {
-          target: apiProxyTarget,
-          changeOrigin: true,
-          xfwd: true,
-        },
-        '^/docs(?:/.*)?$': {
-          target: apiProxyTarget,
-          changeOrigin: true,
-          xfwd: true,
-        },
-        '^/schemas(?:/.*)?$': {
-          target: apiProxyTarget,
-          changeOrigin: true,
-          xfwd: true,
-        },
-      },
+      proxy: apiProxy,
+    },
+    // 预览构建产物时复用同一组代理，保证 /api 仍然打到当前后端。
+    preview: {
+      port: 4176,
+      proxy: apiProxy,
     },
     test: {
       include: ['src/**/*.test.ts'],

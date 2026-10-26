@@ -263,7 +263,7 @@ async function jumpToField(entry: BaseSettingSearchEntry) {
 .setting-groups {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--sd-space-2xs);
+  gap: 0.875rem;
   padding-bottom: var(--sd-space-xl);
 }
 

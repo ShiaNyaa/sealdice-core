@@ -1,7 +1,59 @@
 <template>
   <main class="tool-test-page sd-page-flow">
-    <PageHeader title="指令测试">
-      <div class="tool-test-page__controls">
+    <PageHeader
+      title="指令测试"
+      description="按当前会话上下文发送指令，验证牌堆、扩展与回复行为。"
+    >
+      <template #meta>
+        <span class="test-status" :class="{ 'is-live': toolTest.realtimeActive.value }">
+          <span class="test-status__dot" />
+          {{
+            toolTest.realtimeTransport.value === 'polling'
+              ? '轮询'
+              : toolTest.realtimeTransport.value === 'sse'
+                ? 'SSE'
+                : '未连接'
+          }}
+        </span>
+      </template>
+      <NPopover placement="bottom-end" trigger="click">
+        <template #trigger>
+          <NButton secondary size="small">
+            <template #icon>
+              <NIcon><i-tabler-dots /></NIcon>
+            </template>
+            操作
+          </NButton>
+        </template>
+        <div class="tool-test-page__quick-actions">
+          <NButton
+            secondary
+            :loading="toolTest.reloadDeckMutation.isPending.value"
+            @click="toolTest.reloadDeck"
+          >
+            重载牌堆
+          </NButton>
+          <NButton
+            secondary
+            :loading="toolTest.reloadJsMutation.isPending.value"
+            @click="toolTest.reloadJs"
+          >
+            重载 JS
+          </NButton>
+          <NButton
+            secondary
+            :loading="toolTest.reloadHelpdocMutation.isPending.value"
+            @click="toolTest.reloadHelpdoc"
+          >
+            重载帮助文档
+          </NButton>
+        </div>
+      </NPopover>
+    </PageHeader>
+
+    <section class="tool-test-toolbar" aria-label="测试会话设置">
+      <div class="tool-test-toolbar__group">
+        <span class="tool-test-toolbar__label">会话</span>
         <NRadioGroup v-model:value="toolTest.mode.value" size="small">
           <NRadioButton value="private">私聊</NRadioButton>
           <NRadioButton value="group">群聊</NRadioButton>
@@ -14,6 +66,9 @@
           :options="privateSenderOptions"
           @update:value="toolTest.loadContext('private')"
         />
+      </div>
+      <div class="tool-test-toolbar__group">
+        <span class="tool-test-toolbar__label">消息分段</span>
         <NRadioGroup v-model:value="toolTest.splitOptionKey.value" size="small">
           <NRadioButton
             v-for="option in toolTest.splitOptions.value"
@@ -23,50 +78,8 @@
             {{ option.label }}
           </NRadioButton>
         </NRadioGroup>
-        <NTag :type="toolTest.realtimeActive.value ? 'success' : 'warning'" size="small">
-          {{
-            toolTest.realtimeTransport.value === 'polling'
-              ? '轮询'
-              : toolTest.realtimeTransport.value === 'sse'
-                ? 'SSE'
-                : '未连接'
-          }}
-        </NTag>
-        <NPopover placement="bottom-end" trigger="click">
-          <template #trigger>
-            <NButton secondary size="small">
-              <template #icon>
-                <NIcon><i-tabler-dots /></NIcon>
-              </template>
-              操作
-            </NButton>
-          </template>
-          <div class="tool-test-page__quick-actions">
-            <NButton
-              secondary
-              :loading="toolTest.reloadDeckMutation.isPending.value"
-              @click="toolTest.reloadDeck"
-            >
-              重载牌堆
-            </NButton>
-            <NButton
-              secondary
-              :loading="toolTest.reloadJsMutation.isPending.value"
-              @click="toolTest.reloadJs"
-            >
-              重载 JS
-            </NButton>
-            <NButton
-              secondary
-              :loading="toolTest.reloadHelpdocMutation.isPending.value"
-              @click="toolTest.reloadHelpdoc"
-            >
-              重载帮助文档
-            </NButton>
-          </div>
-        </NPopover>
       </div>
-    </PageHeader>
+    </section>
 
     <TipBox v-if="toolTest.commandErrorText.value" type="warning" class="tool-test-page__alert">
       {{ toolTest.commandErrorText.value }}
@@ -133,7 +146,7 @@
 
 <script setup lang="ts">
 import { computed, shallowRef } from 'vue';
-import { NButton, NIcon, NPopover, NRadioButton, NRadioGroup, NSelect, NTag } from 'naive-ui';
+import { NButton, NIcon, NPopover, NRadioButton, NRadioGroup, NSelect } from 'naive-ui';
 import ToolTestChatWindow from '@/components/tool-test/ToolTestChatWindow.vue';
 import ToolTestCommandComposer from '@/components/tool-test/ToolTestCommandComposer.vue';
 import ToolTestMemberRail from '@/components/tool-test/ToolTestMemberRail.vue';
@@ -194,6 +207,63 @@ async function handleSelectProfile(profile: ToolTestProfile) {
   overflow: hidden;
 }
 
+.test-status {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius-pill);
+  background: var(--sd-bg-elevated);
+  color: var(--sd-text-muted);
+  font-size: 0.6875rem;
+  gap: 0.4rem;
+  line-height: 1;
+  padding: 0.32rem 0.6rem;
+}
+
+.test-status__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sd-text-muted);
+}
+
+.test-status.is-live {
+  border-color: var(--sd-success-border);
+  background: var(--sd-success-soft);
+  color: var(--sd-success);
+}
+
+.test-status.is-live .test-status__dot {
+  background: var(--sd-success);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sd-success) 18%, transparent);
+}
+
+.tool-test-toolbar {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius-lg);
+  background: var(--sd-bg-elevated);
+  gap: 2rem;
+  padding: 0.6rem 0.85rem;
+}
+
+.tool-test-toolbar__group {
+  display: flex;
+  min-width: 0;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.tool-test-toolbar__label {
+  color: var(--sd-text-muted);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+}
+
 .tool-test-page__controls {
   display: flex;
   min-width: 0;
@@ -204,7 +274,20 @@ async function handleSelectProfile(profile: ToolTestProfile) {
 }
 
 .tool-test-page__private-sender {
-  width: min(14rem, 100%);
+  width: min(15rem, 100%);
+}
+
+@media (max-width: 640px) {
+  .tool-test-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .tool-test-toolbar__group {
+    width: 100%;
+    flex-wrap: wrap;
+  }
 }
 
 .tool-test-page__quick-actions {

@@ -1,75 +1,67 @@
 <template>
-  <n-page-header class="sd-breadcrumb-bar" :class="{ 'sd-breadcrumb-bar--compact': isCompactMode }">
-    <template #title>
-      <div class="sd-breadcrumb-title">
-        <!-- 桌面收起态用主题主色提示侧栏状态，移动端仍保持普通菜单按钮。 -->
-        <n-button
-          class="sd-sidebar-toggle"
-          :class="{ 'sd-sidebar-toggle--collapsed': props.collapsed && !isMobileMode }"
-          size="small"
-          quaternary
-          circle
-          :type="props.collapsed && !isMobileMode ? 'primary' : 'default'"
-          @click="emit('toggleSidebar')"
-        >
-          <template #icon>
-            <n-icon size="1.2rem">
-              <i-tabler-menu-2 v-if="isMobileMode" />
-              <i-tabler-layout-sidebar-left-expand v-else-if="props.collapsed" />
-              <i-tabler-layout-sidebar-left-collapse v-else />
-            </n-icon>
-          </template>
-        </n-button>
+  <header class="sd-topbar" :class="{ 'sd-topbar--compact': isCompactMode }">
+    <div class="sd-topbar__lead">
+      <button
+        type="button"
+        class="icon-action"
+        :class="{ 'is-on': props.collapsed && !isMobileMode }"
+        :aria-label="isMobileMode ? '打开菜单' : props.collapsed ? '展开侧栏' : '收起侧栏'"
+        @click="emit('toggleSidebar')"
+      >
+        <i-tabler-menu-2 v-if="isMobileMode" />
+        <i-tabler-layout-sidebar-left-expand v-else-if="props.collapsed" />
+        <i-tabler-layout-sidebar-left-collapse v-else />
+      </button>
 
-        <n-breadcrumb>
-          <n-breadcrumb-item
-            v-for="(item, index) in visibleBreadcrumbItems"
-            :key="`${index}-${item.label}`"
-            :clickable="Boolean(item.to)"
+      <nav class="sd-crumbs" aria-label="面包屑">
+        <template v-for="(item, index) in visibleBreadcrumbItems" :key="`${index}-${item.label}`">
+          <span v-if="index > 0" class="sd-crumbs__sep" aria-hidden="true">/</span>
+          <RouterLink
+            v-if="item.to && index < visibleBreadcrumbItems.length - 1"
+            :to="item.to"
+            class="sd-crumbs__link"
           >
-            <RouterLink v-if="item.to" :to="item.to">
-              {{ item.label }}
-            </RouterLink>
-            <span v-else>{{ item.label }}</span>
-          </n-breadcrumb-item>
-        </n-breadcrumb>
-      </div>
-    </template>
-
-    <template #extra>
-      <div class="sd-page-actions">
-        <AppUploadIndicator />
-        <AppThemeSwitch />
-        <AppInstallButton v-if="!isCompactMode" />
-
-        <button type="button" class="search-entry" @click="emit('openSearch')">
-          <span class="search-label">
-            <n-icon size="1.1rem">
-              <i-tabler-search />
-            </n-icon>
-            <span>搜索</span>
-          </span>
-          <span class="search-shortcut">Ctrl k</span>
-        </button>
-
-        <div v-if="!isCompactMode" class="version-summary">
-          <n-tag
-            :bordered="false"
-            :type="isStable ? 'success' : 'default'"
-            size="small"
-            class="version-channel"
+            {{ item.label }}
+          </RouterLink>
+          <span
+            v-else
+            class="sd-crumbs__current"
+            :aria-current="index === visibleBreadcrumbItems.length - 1 ? 'page' : undefined"
           >
-            {{ channelText }}
-          </n-tag>
-          <span class="version-text">{{ overview?.version.simple ?? '-' }}</span>
-          <span v-if="hasNewVersion" class="new-version">
-            新版本 {{ overview?.version.latest }}
+            {{ item.label }}
           </span>
-        </div>
-        <AppHeaderOverflowMenu v-if="isCompactMode" />
+        </template>
+      </nav>
+    </div>
+
+    <div class="sd-topbar__actions">
+      <AppUploadIndicator />
+
+      <button
+        type="button"
+        class="search-entry"
+        :aria-label="isCompactMode ? '搜索' : undefined"
+        @click="emit('openSearch')"
+      >
+        <i-tabler-search class="search-entry__icon" />
+        <span v-if="!isCompactMode" class="search-entry__label">搜索</span>
+        <kbd v-if="!isCompactMode" class="search-entry__key">Ctrl K</kbd>
+      </button>
+
+      <AppThemeSwitch />
+      <AppInstallButton v-if="!isCompactMode" />
+
+      <div v-if="!isCompactMode" class="version-summary">
+        <span class="version-channel" :class="{ 'is-stable': isStable }">{{ channelText }}</span>
+        <span class="version-text">{{ overview?.version.simple ?? '—' }}</span>
+        <span v-if="hasNewVersion" class="new-version">
+          可升级至 {{ overview?.version.latest }}
+        </span>
       </div>
-    </template>
-  </n-page-header>
+
+      <AppHeaderOverflowMenu v-if="isCompactMode" />
+    </div>
+  </header>
 </template>
 
 <script setup lang="ts">
@@ -103,204 +95,209 @@ const breadcrumbItems = computed(() =>
 const isCompactMode = computed(() => props.viewportMode !== 'desktop');
 const isMobileMode = computed(() => props.viewportMode === 'mobile');
 const visibleBreadcrumbItems = computed(() =>
-  isCompactMode.value ? breadcrumbItems.value.slice(0, -1) : breadcrumbItems.value
+  isCompactMode.value ? breadcrumbItems.value.slice(-2) : breadcrumbItems.value
 );
 </script>
 
 <style scoped>
-.sd-breadcrumb-bar {
-  min-height: 56px;
+.sd-topbar {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 30;
+  display: flex;
+  height: 56px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid var(--sd-border-soft);
-  background: var(--sd-bg-elevated);
-  padding: 0.65rem 1rem;
+  background: color-mix(in srgb, var(--sd-bg-shell) 82%, transparent);
+  gap: 1rem;
+  padding: 0 1.25rem 0 0.85rem;
+  backdrop-filter: saturate(160%) blur(14px);
 }
 
-.sd-breadcrumb-title {
+.sd-topbar__lead {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
-.sd-sidebar-toggle {
+.icon-action {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
   flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--sd-radius-sm);
+  background: transparent;
+  color: var(--sd-text-muted);
+  cursor: pointer;
+  font-size: 18px;
   transition:
     background-color var(--sd-transition-fast),
     color var(--sd-transition-fast);
 }
 
-.sd-sidebar-toggle--collapsed {
-  background: var(--sd-bg-selected);
+.icon-action:hover {
+  background: var(--sd-bg-hover);
+  color: var(--sd-text-primary);
+}
+
+.icon-action.is-on {
   color: var(--sd-primary);
 }
 
-.sd-sidebar-toggle--collapsed:hover {
-  background: var(--sd-bg-selected-strong);
-  color: var(--sd-primary);
+.sd-crumbs {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.4rem;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-/* 渠道 badge 与版本信息是一组，badge 与两行文字整体居中对齐。 */
-.version-summary {
+.sd-crumbs__link,
+.sd-crumbs__current {
+  overflow: hidden;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+}
+
+.sd-crumbs__link {
+  color: var(--sd-text-muted);
+  text-decoration: none;
+  transition: color var(--sd-transition-fast);
+}
+
+.sd-crumbs__link:hover {
+  color: var(--sd-text-primary);
+}
+
+.sd-crumbs__current {
+  color: var(--sd-text-primary);
+  font-weight: 520;
+}
+
+.sd-crumbs__sep {
+  color: var(--sd-border);
+  font-size: 0.75rem;
+}
+
+.sd-topbar__actions {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
+  gap: 0.35rem;
+}
+
+.search-entry {
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius-pill);
+  background: var(--sd-bg-elevated);
+  color: var(--sd-text-muted);
+  cursor: pointer;
   gap: 0.4rem;
-  margin-left: 0.25rem;
+  padding: 0 0.4rem 0 0.7rem;
+  transition:
+    border-color var(--sd-transition-fast),
+    color var(--sd-transition-fast),
+    background-color var(--sd-transition-fast);
+}
+
+.search-entry:hover {
+  border-color: var(--sd-primary-border);
+  background: var(--sd-bg-elevated);
+  color: var(--sd-text-secondary);
+}
+
+.search-entry__icon {
+  font-size: 15px;
+}
+
+.search-entry__label {
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.search-entry__key {
+  border: 1px solid var(--sd-border-soft);
+  border-radius: 5px;
+  background: var(--sd-bg-control);
+  color: var(--sd-text-muted);
+  font-family: var(--sd-font-sans);
+  font-size: 0.625rem;
+  line-height: 1;
+  padding: 0.2rem 0.3rem;
+}
+
+.version-summary {
+  display: flex;
+  align-items: center;
+  border-left: 1px solid var(--sd-border-soft);
+  gap: 0.4rem;
+  margin-left: 0.35rem;
+  padding-left: 0.7rem;
 }
 
 .version-channel {
-  font-size: 0.75rem;
+  border-radius: var(--sd-radius-pill);
+  background: var(--sd-bg-control);
+  color: var(--sd-text-muted);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  padding: 0.22rem 0.42rem;
+}
+
+.version-channel.is-stable {
+  background: var(--sd-success-soft);
+  color: var(--sd-success);
 }
 
 .version-text {
   color: var(--sd-text-secondary);
-  cursor: default;
-  font-size: 0.82rem;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
 .new-version {
   color: var(--sd-warning);
-  font-size: 0.78rem;
+  font-size: 0.6875rem;
   line-height: 1;
   white-space: nowrap;
 }
-:deep(.n-page-header__title) {
-  width: 100%;
+
+.sd-topbar--compact {
+  padding-inline: 0.55rem 0.7rem;
 }
 
-.sd-page-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.search-entry {
-  display: inline-flex;
-  height: 34px;
-  align-items: center;
-  border: 0;
-  border-radius: var(--sd-radius-sm);
-  background: var(--sd-bg-control);
-  color: var(--sd-text-secondary);
-  cursor: pointer;
-  font: inherit;
-  gap: 0.55rem;
-  line-height: 1;
-  padding: 0 0.5rem 0 0.7rem;
-  transition:
-    background-color var(--sd-transition-fast),
-    color var(--sd-transition-fast);
-}
-
-.search-entry:hover {
-  background: var(--sd-bg-control-hover);
-}
-
-.search-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.search-shortcut {
-  display: inline-flex;
-  height: 22px;
-  align-items: center;
-  border-radius: var(--sd-radius-sm);
-  background: var(--sd-bg-elevated);
-  color: var(--sd-text-muted);
-  font-size: 0.75rem;
-  line-height: 1;
-  padding: 0 0.45rem;
-  white-space: nowrap;
-}
-
-:deep(.n-breadcrumb-item:last-child .n-breadcrumb-item__link) {
-  color: var(--sd-text-primary);
-  font-weight: 600;
-}
-
-.feed-content {
-  margin-top: 10px;
-  margin-bottom: 20px;
-  text-align: left;
-}
-
-:deep(.n-breadcrumb) {
-  min-width: 0;
-}
-
-:deep(.n-breadcrumb-item__link) {
-  color: inherit;
-  text-decoration: none;
-}
-
-.sd-breadcrumb-bar--compact :deep(.n-page-header__main) {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.sd-breadcrumb-bar--compact :deep(.n-page-header__title),
-.sd-breadcrumb-bar--compact :deep(.n-page-header__extra) {
-  min-width: 0;
-}
-
-.sd-breadcrumb-bar--compact .sd-breadcrumb-title {
-  min-width: 0;
-  overflow: hidden;
-}
-
-.sd-breadcrumb-bar--compact :deep(.n-breadcrumb) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sd-breadcrumb-bar--compact .sd-page-actions {
-  flex-shrink: 0;
-  gap: 0.25rem;
-}
-
-.sd-breadcrumb-bar--compact .search-entry {
-  flex: 0 0 34px;
-  width: 34px;
+.sd-topbar--compact .search-entry {
+  width: 32px;
   justify-content: center;
   padding: 0;
 }
 
-.sd-breadcrumb-bar--compact .search-label span,
-.sd-breadcrumb-bar--compact .search-shortcut {
-  display: none;
+.sd-topbar--compact .sd-crumbs__current {
+  max-width: 40vw;
 }
 
-@media screen and (max-width: 639.9px) {
-  :deep(.n-page-header__main) {
-    flex: 1 1 auto;
-    min-width: 0;
+@media screen and (max-width: 1280px) {
+  .version-summary {
+    display: none;
   }
+}
 
-  :deep(.n-page-header__title),
-  :deep(.n-page-header__extra) {
-    min-width: 0;
-  }
-
-  .sd-breadcrumb-title {
-    min-width: 0;
-    overflow: hidden;
-  }
-
-  :deep(.n-breadcrumb) {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .sd-breadcrumb-bar {
-    padding-inline: 0.75rem;
+@media screen and (max-width: 767.9px) {
+  .sd-topbar {
+    height: 52px;
   }
 }
 </style>

@@ -39,13 +39,14 @@ const iconVisible = computed(
   display: flex;
   /* 图标相对整个提示框垂直居中。规范限定「一条提示只讲一个主题」，
      正文不会长到让居中的图标显得脱离文字。 */
-  align-items: center;
-  gap: var(--sd-space-xs);
-  border-left: 3px solid var(--tip-box-accent);
-  border-radius: var(--sd-radius-xs);
+  align-items: flex-start;
+  gap: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--tip-box-accent) 18%, transparent);
+  border-radius: var(--sd-radius-md);
   background: var(--tip-box-surface);
-  padding: var(--sd-space-sm) var(--sd-space-md);
+  padding: 0.7rem 0.85rem;
   color: var(--sd-text-primary);
+  font-size: 0.8125rem;
   line-height: 1.6;
 }
 
@@ -71,10 +72,11 @@ const iconVisible = computed(
 }
 
 .tip-box__icon {
-  flex: 0 0 auto;
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   color: var(--tip-box-accent);
+  padding-top: 0.2rem;
 }
 
 .tip-box__body {

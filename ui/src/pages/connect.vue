@@ -21,7 +21,11 @@
       </div>
     </TipBox>
 
-    <ListEmptyState v-if="connections.length === 0 && connectionsReady" description="暂无接入账号">
+    <ListEmptyState
+      v-if="connections.length === 0 && connectionsReady"
+      description="暂无接入账号"
+      bordered
+    >
       <n-button type="primary" :disabled="isTestMode" @click="openCreateDialog">
         添加账号
       </n-button>

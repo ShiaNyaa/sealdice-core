@@ -363,6 +363,4 @@ useUnsavedChanges('js-config', {
   border-top: 1px solid var(--sd-border-soft);
 }
 
-@media screen and (max-width: 639.9px) {
-}
 </style>

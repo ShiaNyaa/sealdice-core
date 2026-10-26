@@ -22,7 +22,7 @@
     </PageHeader>
 
     <template v-if="jsEnable">
-      <n-tabs v-model:value="tab" justify-content="space-evenly" class="js-tabs">
+      <n-tabs v-model:value="tab" justify-content="start" class="js-tabs">
         <n-tab-pane tab="控制台" name="console">
           <section class="js-console-grid">
             <section class="js-panel js-editor-panel">

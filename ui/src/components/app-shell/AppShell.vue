@@ -1,56 +1,48 @@
 <template>
-  <n-layout id="root" class="sd-shell">
-    <n-layout class="sd-body" has-sider>
-      <n-layout-sider
-        class="sd-sidebar no-scrollbar"
-        collapse-mode="width"
-        :collapsed-width="64"
-        :width="224"
-        :collapsed="collapsedMenu"
-        bordered
-        :native-scrollbar="false"
-        @collapse="collapsedMenu = true"
-        @expand="collapsedMenu = false"
-      >
-        <AppSidebar
-          :collapsed="collapsedMenu"
-          :advanced-config-counter="advancedConfigCounter"
-          @enable-advanced-config="enableAdvancedConfig"
-        />
-      </n-layout-sider>
+  <div id="root" class="sd-shell">
+    <div class="sd-ambient-glow" aria-hidden="true" />
 
-      <n-layout-content
-        class="sd-content-pane"
-        :native-scrollbar="false"
-        content-class="sd-content-inner"
-        embedded
-      >
-        <AppBreadcrumb
-          :collapsed="collapsedMenu"
-          :viewport-mode="viewportMode"
-          @toggle-sidebar="toggleSidebar"
-          @open-search="openSearch"
-        />
+    <aside class="sd-sidebar" :class="{ 'is-collapsed': collapsedMenu }">
+      <AppSidebar
+        :collapsed="collapsedMenu"
+        :advanced-config-counter="advancedConfigCounter"
+        @enable-advanced-config="enableAdvancedConfig"
+      />
+    </aside>
+
+    <div class="sd-main">
+      <AppBreadcrumb
+        :collapsed="collapsedMenu"
+        :viewport-mode="viewportMode"
+        @toggle-sidebar="toggleSidebar"
+        @open-search="openSearch"
+      />
+
+      <div class="sd-notice-layer">
         <AppUiBetaNotice />
+      </div>
+
+      <div
+        class="sd-floating-panel-layer"
+        :class="{ 'sd-floating-panel-layer--active': hasPendingActions }"
+        :style="floatingPanelStyle"
+      >
+        <AppUnsavedChangesPanel />
+      </div>
+
+      <main class="sd-content" :class="getAppShellContentClass(props.contentMode)">
         <div
-          class="sd-floating-panel-layer"
-          :class="{ 'sd-floating-panel-layer--active': hasPendingActions }"
-          :style="floatingPanelStyle"
+          :class="[
+            getAppShellContainerClass(props.containerMode),
+            { 'sd-main-container--pending': hasPendingActions },
+          ]"
         >
-          <AppUnsavedChangesPanel />
+          <slot />
         </div>
-        <main :class="getAppShellContentClass(props.contentMode)">
-          <div
-            :class="[
-              getAppShellContainerClass(props.containerMode),
-              { 'sd-main-container--pending': hasPendingActions },
-            ]"
-          >
-            <slot />
-          </div>
-        </main>
-      </n-layout-content>
-    </n-layout>
+      </main>
+    </div>
+
+    <AppMobileTabBar @open-menu="drawerMenu = true" />
 
     <n-drawer
       v-model:show="drawerMenu"
@@ -71,7 +63,7 @@
       ref="searchMenuRef"
       :advanced-config-counter="advancedConfigCounter"
     />
-  </n-layout>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -89,6 +81,7 @@ import {
   type AppShellContentMode,
 } from './appShellLayout';
 import AppBreadcrumb from './AppBreadcrumb.vue';
+import AppMobileTabBar from './AppMobileTabBar.vue';
 import AppSidebar from './AppSidebar.vue';
 import AppUiBetaNotice from './AppUiBetaNotice.vue';
 import AppUnsavedChangesPanel from './AppUnsavedChangesPanel.vue';
@@ -128,7 +121,7 @@ const drawerMenu = ref(false);
 const collapsedMenu = ref(shouldCollapseAppShellSidebar(viewportMode.value));
 const floatingPanelStyle = computed(() => {
   if (viewportMode.value === 'mobile') return undefined;
-  const sidebarWidth = collapsedMenu.value ? 64 : 224;
+  const sidebarWidth = collapsedMenu.value ? 66 : 252;
   return {
     left: `calc(${sidebarWidth}px + (100vw - ${sidebarWidth}px) / 2)`,
     width: `min(100%, calc(100vw - ${sidebarWidth}px - 2rem))`,
@@ -218,68 +211,63 @@ onBeforeUnmount(releaseConfirmHandler);
 
 <style scoped>
 .sd-shell {
+  position: relative;
   display: flex;
   width: 100%;
   min-width: 0;
-  height: 100vh;
   min-height: 100vh;
-  background: var(--sd-bg-shell);
-}
-
-:global(.sd-shell > .n-layout-scroll-container) {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-}
-
-.sd-body {
-  width: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
-  background: var(--sd-bg-page);
-}
-
-:global(.sd-body > .n-layout-scroll-container) {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
+  background: var(--sd-bg-app);
 }
 
 .sd-sidebar {
-  height: 100%;
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  width: 252px;
+  height: 100vh;
+  flex: 0 0 auto;
+  flex-direction: column;
   border-right: 1px solid var(--sd-border-sidebar);
   background: var(--sd-bg-sidebar);
-  text-align: left;
   transition: width var(--sd-transition-base);
 }
 
-:global(.sd-sidebar > .n-scrollbar > .n-scrollbar-container > .n-scrollbar-content) {
-  height: 100%;
+.sd-sidebar.is-collapsed {
+  width: 66px;
 }
 
-.sd-content-pane {
+.sd-main {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.sd-notice-layer {
+  padding: 0.75rem clamp(1rem, 2.4vw, 2rem) 0;
+}
+
+.sd-notice-layer:empty {
+  display: none;
+}
+
+.sd-content {
+  display: flex;
+  width: 100%;
   flex: 1 1 auto;
   min-width: 0;
-  background: var(--sd-bg-page);
-  text-align: left;
-}
-
-:global(.sd-content-inner) {
-  width: 100%;
-  min-height: 100%;
+  padding: 1rem clamp(1rem, 2.4vw, 2rem) 3.5rem;
 }
 
 .sd-main-container {
   box-sizing: border-box;
   width: 100%;
   max-width: var(--sd-content-max-width);
-  min-height: 100%;
   min-width: 0;
   margin-inline: auto;
-  padding: var(--sd-space-xl) clamp(var(--sd-space-md), 2vw, var(--sd-space-2xl))
-    var(--sd-space-2xl);
 }
 
 .sd-main-container--wide {
@@ -288,45 +276,40 @@ onBeforeUnmount(releaseConfirmHandler);
   margin-inline: 0;
 }
 
-/* 移动端沉底状态条会盖住页面末尾，脏态出现时补足底部空间。
-   位移与状态条淡入同时发生，读起来是一个动作。 */
+.sd-page-shell {
+  width: 100%;
+  min-width: 0;
+}
+
+.sd-page-shell--workspace {
+  display: flex;
+  min-height: calc(100vh - 9rem);
+  flex-direction: column;
+}
+
+/* 移动端沉底状态条会盖住页面末尾，脏态出现时补足底部空间。 */
 @media screen and (max-width: 767.9px) {
   .sd-main-container--pending {
     padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
-.sd-page-shell {
-  min-width: 0;
-}
-
-.sd-page-shell--workspace {
-  display: flex;
-  min-height: calc(100vh - 5.5rem);
-  flex-direction: column;
-}
-
 .sd-floating-panel-layer {
   position: fixed;
-  top: 4.4rem;
+  top: 4.25rem;
   left: 50%;
   z-index: 40;
   display: flex;
+  width: min(100%, calc(100vw - 16rem));
   justify-content: center;
   pointer-events: none;
-  width: min(100%, calc(100vw - 15rem));
   transform: translateX(-50%);
 }
 
-.sd-floating-panel-layer--active {
-  pointer-events: none;
-}
-
-/* 移动端把待处理状态条沉到底部：拇指可达，且不与面包屑争夺顶部空间。 */
 @media screen and (max-width: 767.9px) {
   .sd-floating-panel-layer {
     top: auto;
-    bottom: 0;
+    bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
     left: 0;
     width: 100%;
     transform: none;
@@ -337,9 +320,6 @@ onBeforeUnmount(releaseConfirmHandler);
   background: var(--sd-bg-sidebar);
 }
 
-/* 抽屉里的滚动容器高度由内容决定，侧边栏的 height: 100% 会退化成 auto，
-   footer 因此停在内容末尾而不是底部。给这一段确定高度，让侧边栏拿到与桌面
-   sider 相同的约束：footer 始终黏底，超长时由菜单自身滚动而非整个抽屉。 */
 :global(.sd-drawer .n-drawer-body-content-wrapper) {
   display: flex;
   height: 100%;
@@ -357,8 +337,22 @@ onBeforeUnmount(releaseConfirmHandler);
     display: none;
   }
 
-  .sd-main-container {
-    padding: var(--sd-space-md);
+  .sd-content {
+    padding: 0.85rem 0.9rem calc(5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .sd-notice-layer {
+    padding: 0.6rem 0.9rem 0;
+  }
+
+  .sd-page-shell--workspace {
+    min-height: calc(100vh - 11rem);
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1023.9px) {
+  .sd-content {
+    padding: 1.25rem 1.25rem 3rem;
   }
 }
 </style>

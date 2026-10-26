@@ -63,7 +63,7 @@ const text = computed(() => {
   margin: 0;
   padding: 0.28rem 0;
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: break-word;
   font-family: inherit;
 }
 

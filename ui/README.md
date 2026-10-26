@@ -7,11 +7,22 @@ SealDice 的新版管理后台 UI，基于 Vue 3 + TypeScript + Naive UI 构建�
 ## 技术栈
 
 - Vue 3 + TypeScript
-- Naive UI
+- Naive UI（组件与主题覆盖）
 - Vue Query（服务端状态）
-- Tailwind CSS v3
+- Pinia（跨页面客户端状态）
+- Tailwind CSS v3（`darkMode: class`，与设计 token 共用）
 - @hey-api/openapi-ts（API 客户端生成）
 - vue-router/auto-routes（文件路由）
+
+界面层新增能力：
+
+- 动效：motion-v（入场与手势）、GSAP（首页入场时间轴）、Vue Bits 与 Inspira UI 源码组件（`src/components/bits`、`src/components/inspira`）
+- 图表：ECharts + vue-echarts（按需注册，见 `src/components/charts/echarts.ts`）
+- 图标：unplugin-icons（编译期静态图标）+ @iconify/vue（运行时按名称取图标，`src/lib/icons.ts` 离线注册导航图标）
+- 字体：Geist / Geist Mono（`@fontsource-variable`），中文回退到系统字族
+- 滚动：Lenis（仅桌面精确指针设备启用）
+- 表单：vee-validate + zod（解锁弹窗为参考实现）
+- 样式约束：Stylelint（`pnpm run lint:style`）
 
 ## 快速开始
 
@@ -46,8 +57,20 @@ pnpm run generate-api
 pnpm run type-check    # TypeScript 类型检查
 pnpm run build-only    # Vite 生产构建，要求已存在 generated API
 pnpm run build         # generate-api + type-check + build
-pnpm run lint          # ESLint
+pnpm run lint          # Oxlint + ESLint + Stylelint
+pnpm run lint:style    # 仅检查 <style> 与 CSS
 ```
+
+## 设计系统
+
+视觉规范集中在 `src/assets/base.css` 的 `:root` / `.dark` 语义 token 与 `src/features/theme/themePalette.ts` 的 Naive UI 覆盖中。新页面只应引用语义 token（`--sd-bg-*`、`--sd-text-*`、`--sd-border-*`、`--sd-radius-*`），不要散落固定灰阶或蓝阶。
+
+- 表面层级由明度差与 1px 边框表达，静态卡片不使用投影；投影只用于浮层。
+- 强调色仅用于主操作、当前导航、关键数据。语义状态色成对提供 `-soft` / `-border`。
+- 中文使用系统字族，拉丁与数字使用 Geist；数字统一 `tabular-nums`。
+- 应用壳层为浅色/深色自适应的固定侧栏 + 粘性顶栏；移动端切换为抽屉菜单 + 底部快捷导航（`AppMobileTabBar.vue`）。
+- 页面入场动画默认由 `App.vue` 的 `page-swap` 过渡承担；需要编排的页面（如运行概览）在页面内用 GSAP timeline 组织，并尊重 `prefers-reduced-motion`。
+- 图表颜色跟随主题，通过 `useThemeStore().isDark` 选择色值，不直接读取 CSS 变量（Canvas 不解析 `var()`）。
 
 ## 浏览器兼容
 

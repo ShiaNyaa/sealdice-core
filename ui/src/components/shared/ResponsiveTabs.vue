@@ -1,7 +1,7 @@
 <template>
   <ResponsiveDataView class="responsive-tabs" :compact-at="props.compactAt">
     <template #table>
-      <n-tabs v-model:value="model" type="line" animated>
+      <n-tabs v-model:value="model" type="line" animated class="sd-setting-tabs">
         <n-tab-pane
           v-for="option in props.options"
           :key="option.value"
@@ -73,5 +73,58 @@ const selectedOption = computed(
 
 .responsive-tabs__panel {
   min-width: 0;
+}
+
+/* 分类切换改成圆角分段控件：比下划线更贴近当前控制台的视觉语言。 */
+.sd-setting-tabs :deep(.n-tabs-nav--line-type .n-tabs-nav-scroll-content) {
+  border-bottom: none;
+}
+
+.sd-setting-tabs :deep(.n-tabs-nav) {
+  display: inline-flex;
+  max-width: 100%;
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius-pill);
+  background: var(--sd-bg-elevated-soft);
+  padding: 3px;
+}
+
+.sd-setting-tabs :deep(.n-tabs-nav-scroll-content) {
+  gap: 2px;
+}
+
+.sd-setting-tabs :deep(.n-tabs-tab-pad) {
+  display: none;
+}
+
+.sd-setting-tabs :deep(.n-tabs-tab) {
+  height: 30px;
+  border-radius: var(--sd-radius-pill);
+  color: var(--sd-text-muted);
+  font-size: 0.78125rem;
+  padding: 0 0.8rem;
+  transition:
+    background-color var(--sd-transition-fast),
+    color var(--sd-transition-fast);
+}
+
+.sd-setting-tabs :deep(.n-tabs-tab:hover) {
+  background: var(--sd-bg-hover);
+  color: var(--sd-text-secondary);
+}
+
+.sd-setting-tabs :deep(.n-tabs-tab.n-tabs-tab--active) {
+  background: var(--sd-bg-elevated);
+  box-shadow: var(--sd-shadow-panel);
+  color: var(--sd-text-primary);
+  font-weight: 520;
+}
+
+.sd-setting-tabs :deep(.n-tabs-bar) {
+  display: none;
+}
+
+.sd-setting-tabs :deep(.n-tabs-pane-wrapper) {
+  margin-top: 1rem;
 }
 </style>

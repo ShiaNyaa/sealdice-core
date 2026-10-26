@@ -1,26 +1,27 @@
 <template>
   <section :class="['setting-category-box', { 'setting-category-box-wide': wide }]">
-    <n-thing class="setting-category-thing">
-      <template #header>
-        <span class="setting-category-heading">
-          <span :id="headingId" class="setting-category-title">{{ title }}</span>
-          <slot name="title-extra" />
-        </span>
-      </template>
-      <template v-if="collapsible" #header-extra>
-        <n-button
-          text
-          size="small"
-          class="setting-category-toggle"
-          :aria-label="expanded ? `收起${title}` : `展开${title}`"
-          :aria-expanded="expanded"
-          :aria-controls="panelId"
-          @click="emit('toggle')"
-        >
-          {{ expanded ? '收起' : '展开' }}
-        </n-button>
-      </template>
-    </n-thing>
+    <header class="setting-category-head">
+      <div class="setting-category-heading">
+        <h2 :id="headingId" class="setting-category-title">{{ title }}</h2>
+        <slot name="title-extra" />
+      </div>
+      <n-button
+        v-if="collapsible"
+        text
+        size="tiny"
+        class="setting-category-toggle"
+        :aria-label="expanded ? `收起${title}` : `展开${title}`"
+        :aria-expanded="expanded"
+        :aria-controls="panelId"
+        @click="emit('toggle')"
+      >
+        <template #icon>
+          <i-tabler-chevron-down v-if="expanded" />
+          <i-tabler-chevron-right v-else />
+        </template>
+        {{ expanded ? '收起' : '展开' }}
+      </n-button>
+    </header>
 
     <div
       v-if="showPanel && (!collapsible || expanded)"
@@ -29,7 +30,9 @@
       role="region"
       :aria-labelledby="headingId"
     >
-      <slot name="notes" />
+      <div v-if="$slots.notes" class="setting-category-notes">
+        <slot name="notes" />
+      </div>
       <div
         :class="[
           'setting-field-layout',
@@ -73,52 +76,57 @@ const emit = defineEmits<{
 
 <style scoped>
 .setting-category-box {
-  padding: var(--sd-space-xs) 0 var(--sd-space-sm);
+  overflow: hidden;
+  border: 1px solid var(--sd-border);
+  border-radius: var(--sd-radius-lg);
+  background: var(--sd-bg-elevated);
 }
 
 .setting-category-box-wide {
   grid-column: 1 / -1;
 }
 
-.setting-category-thing {
-  margin: 0 var(--sd-space-md) var(--sd-space-xs);
-}
-
-.setting-category-title {
-  color: var(--sd-text-primary);
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.35;
+.setting-category-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--sd-border-soft);
+  gap: 0.75rem;
+  padding: 0.8rem 1.1rem;
 }
 
 .setting-category-heading {
   display: inline-flex;
-  align-items: center;
-  gap: var(--sd-space-xs);
   min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.setting-category-title {
+  color: var(--sd-text-primary);
+  font-size: 0.875rem;
+  font-weight: 580;
+  letter-spacing: -0.005em;
+  line-height: 1.35;
 }
 
 .setting-category-toggle {
   flex: 0 0 auto;
+  color: var(--sd-text-muted);
 }
 
 .setting-category-panel {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  overflow: hidden;
-  border-radius: var(--sd-radius-md);
-  background: var(--sd-bg-elevated);
+  padding: 0.55rem 0.4rem 0.75rem;
 }
 
-@media (max-width: 639.9px) {
-  .setting-category-box {
-    padding-bottom: var(--sd-space-xs);
-  }
-
-  .setting-category-thing {
-    margin: 0 var(--sd-space-xs) var(--sd-space-2xs);
-  }
+.setting-category-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.35rem 0.7rem 0.5rem;
 }
 
 .setting-field-layout {
@@ -164,6 +172,14 @@ const emit = defineEmits<{
 }
 
 @media (max-width: 639.9px) {
+  .setting-category-head {
+    padding: 0.7rem 0.85rem;
+  }
+
+  .setting-category-panel {
+    padding-inline: 0.2rem;
+  }
+
   .setting-field-layout-padded {
     padding: var(--sd-space-sm);
   }

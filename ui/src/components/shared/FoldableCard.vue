@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="type === 'card'"
-    class="foldable-card border border-sd-border bg-sd-elevated p-4"
+    class="foldable-card border border-sd-border bg-sd-elevated p-4 rounded-[14px]"
     :class="{
       'shadow-sm': shadow === 'always',
       'shadow-sm hover:shadow-md transition-shadow': shadow === 'hover',
@@ -229,7 +229,7 @@ defineExpose({ open, close });
 
 <style scoped>
 .foldable-card {
-  border-radius: var(--sd-radius-md);
+  border-radius: var(--sd-radius-lg);
 }
 
 .foldable-card-header {
@@ -269,6 +269,9 @@ defineExpose({ open, close });
 .foldable-card-title {
   min-width: 0;
   margin-right: 0.5rem;
+  color: var(--sd-text-primary);
+  font-size: 0.875rem;
+  font-weight: 560;
   overflow-wrap: anywhere;
 }
 
@@ -286,6 +289,9 @@ defineExpose({ open, close });
 
 .foldable-card-description {
   flex: 1 1 auto;
+  color: var(--sd-text-muted);
+  font-size: 0.75rem;
+  line-height: 1.55;
   overflow-wrap: anywhere;
 }
 

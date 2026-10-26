@@ -1,6 +1,8 @@
 <template>
   <main class="about-page sd-page">
-    <AboutHero :summary="summary" :links="ABOUT_LINKS" :loading="loading" />
+    <BlurReveal :duration="0.7" :y-offset="14">
+      <AboutHero :summary="summary" :links="ABOUT_LINKS" :loading="loading" />
+    </BlurReveal>
     <section class="about-credits">
       <h2>感谢</h2>
 
@@ -68,6 +70,7 @@ import { computed } from 'vue';
 import sealImage from '@/assets/seal.png';
 import { buildAvatarUrl, buildContributorHref } from '@/features/about/viewModel';
 import AboutHero from '@/components/about/AboutHero.vue';
+import BlurReveal from '@/components/inspira/BlurReveal.vue';
 import {
   ABOUT_CREDIT_SECTIONS,
   ABOUT_LINKS,
@@ -105,7 +108,9 @@ const creditSections = computed(() =>
 .about-credits > h2 {
   margin: 0;
   color: var(--sd-text-primary);
-  font-size: 26px;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
@@ -125,14 +130,13 @@ const creditSections = computed(() =>
 
 .about-credits__section:first-child {
   border-top: 0;
-  background: linear-gradient(90deg, var(--sd-primary-soft), transparent 72%);
 }
 
 .about-credits__section h3 {
   margin: 0;
   color: var(--sd-text-primary);
-  font-size: 16px;
-  font-weight: 750;
+  font-size: 0.9375rem;
+  font-weight: 580;
   line-height: 1.3;
 }
 

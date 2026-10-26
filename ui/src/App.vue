@@ -16,7 +16,7 @@
                 :watermark-text="testMode.watermarkText.value"
               >
                 <PlainLayout v-if="route.meta.layout === 'plain'">
-                  <Transition name="page-fade" mode="out-in">
+                  <Transition name="page-swap" mode="out-in">
                     <component :is="Component" :key="route.path" />
                   </Transition>
                 </PlainLayout>
@@ -25,7 +25,7 @@
                   :content-mode="getAppShellContentMode(route.meta.layout)"
                   :container-mode="getAppShellContainerMode(route.meta.layout)"
                 >
-                  <Transition name="page-fade" mode="out-in">
+                  <Transition name="page-swap" mode="out-in">
                     <component :is="Component" :key="route.path" />
                   </Transition>
                 </AppShell>
@@ -59,6 +59,7 @@ import { useRealtimeClientStore } from './features/realtime/store';
 import { useTestMode } from './features/testMode/state';
 import { storeToRefs } from 'pinia';
 import { useThemeStore } from './features/theme/store';
+import { useSmoothScroll } from './lib/smoothScroll';
 // App 是全局 provider 和 layout 分发层。页面不要直接挂全局 provider，
 // 否则会出现消息、弹窗、QueryClient 或主题状态多实例的问题。
 const { resolvedTheme, themeOverrides } = storeToRefs(useThemeStore());
@@ -66,6 +67,9 @@ const { resolvedTheme, themeOverrides } = storeToRefs(useThemeStore());
 const activeTheme = computed(() => (resolvedTheme.value === 'dark' ? darkTheme : lightTheme));
 const testMode = useTestMode();
 const authSession = useAuthSession();
+
+// 平滑滚动仅接管桌面精确指针设备；触屏与 prefers-reduced-motion 走原生滚动。
+useSmoothScroll();
 
 // 全局 provider 只接收最终主题对象。颜色计算集中在 features/theme，
 // 避免根组件和业务页面各自维护一套主色、状态色和暗色覆盖。
@@ -77,13 +81,33 @@ useRealtimeClientStore().ensureInitialized();
 </script>
 
 <style>
-.page-fade-enter-active,
-.page-fade-leave-active {
-  transition: opacity 0.2s ease;
+/* 页面切换：轻微上浮 + 淡入，退出更快，避免连续导航时拖影。 */
+.page-swap-enter-active {
+  transition:
+    opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.page-fade-enter-from,
-.page-fade-leave-to {
+.page-swap-leave-active {
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.page-swap-enter-from {
   opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-swap-leave-to {
+  opacity: 0;
+  transform: translateY(-3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-swap-enter-active,
+  .page-swap-leave-active {
+    transition: none;
+  }
 }
 </style>

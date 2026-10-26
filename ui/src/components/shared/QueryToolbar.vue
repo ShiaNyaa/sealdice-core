@@ -86,7 +86,16 @@ onBeforeUnmount(() => {
   padding: var(--sd-space-sm) var(--sd-space-md);
   border: 1px solid var(--sd-border);
   border-radius: var(--sd-radius-md);
-  background: var(--sd-bg-elevated-soft);
+  background: var(--sd-bg-elevated);
+}
+
+.sd-query-toolbar :deep(.n-form-item-label) {
+  color: var(--sd-text-muted);
+  font-size: 0.75rem;
+}
+
+.sd-query-toolbar :deep(.n-form-item-blank) {
+  min-height: 32px;
 }
 
 /*
