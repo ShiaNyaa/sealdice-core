@@ -57,3 +57,6 @@ upgrade_metadata.json
 
 /signature/**/*
 ui/components.d.ts
+
+# 本地工作区记忆与工具数据
+.workbuddy/

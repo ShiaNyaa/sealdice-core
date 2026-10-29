@@ -70,6 +70,7 @@ const option = computed<EChartsOption>(() => {
         backgroundStyle: { color: trackColor, borderRadius: 5 },
         data: props.targets.map(target => ({
           value: target.durationMs,
+          ok: target.ok,
           itemStyle: {
             color: target.ok ? accent : danger,
             borderRadius: [0, 5, 5, 0],
@@ -80,7 +81,11 @@ const option = computed<EChartsOption>(() => {
           position: 'right',
           color: textColor,
           fontSize: 11,
-          formatter: ({ value }) => (isCompact.value ? `${value}` : `${value} ms`),
+          formatter: params => {
+            const item = params.data as { value: number; ok: boolean };
+            if (!item.ok) return '不可达';
+            return isCompact.value ? `${item.value}` : `${item.value} ms`;
+          },
         },
       },
     ],

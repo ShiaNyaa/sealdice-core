@@ -39,13 +39,16 @@
           内存占用
         </span>
         <div class="stat__value">
-          <NumberTicker
-            :value="memoryMegabytes"
-            :decimal-places="1"
-            :duration="1100"
-            class="stat__number"
-          />
-          <span class="stat__unit">MB</span>
+          <template v-if="overview">
+            <NumberTicker
+              :value="memoryMegabytes"
+              :decimal-places="1"
+              :duration="1100"
+              class="stat__number"
+            />
+            <span class="stat__unit">MB</span>
+          </template>
+          <span v-else class="stat__placeholder">—</span>
         </div>
         <span class="stat__foot" :title="runtimeSummary">{{ runtimeSummary }}</span>
       </article>
@@ -56,19 +59,25 @@
           群组服务
         </span>
         <div class="stat__value">
-          <NumberTicker
-            :value="groupSummary?.joined ?? 0"
-            :decimal-places="0"
-            :duration="1100"
-            class="stat__number"
-          />
-          <span class="stat__unit">个已加入</span>
+          <template v-if="groupSummary">
+            <NumberTicker
+              :value="groupSummary.joined"
+              :decimal-places="0"
+              :duration="1100"
+              class="stat__number"
+            />
+            <span class="stat__unit">个已加入</span>
+          </template>
+          <span v-else class="stat__placeholder">—</span>
         </div>
         <span class="stat__foot">
-          已启用
-          <strong>{{ groupSummary?.enabled ?? 0 }}</strong>
-          · 未启用
-          <strong>{{ inactiveGroups }}</strong>
+          <template v-if="groupSummary">
+            已启用
+            <strong>{{ groupSummary.enabled }}</strong>
+            · 未启用
+            <strong>{{ inactiveGroups }}</strong>
+          </template>
+          <template v-else>等待群组数据</template>
         </span>
       </article>
 
@@ -658,6 +667,13 @@ onBeforeUnmount(() => {
 .stat__unit {
   color: var(--sd-text-muted);
   font-size: 0.78rem;
+}
+
+.stat__placeholder {
+  color: var(--sd-text-muted);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 .stat__foot {

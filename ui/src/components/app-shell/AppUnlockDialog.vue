@@ -107,11 +107,12 @@ const showDialog = computed(() => authSession.needsUnlock.value);
 const canCheckSecurity = computed(
   () => authSession.hasAccessToken.value && !authSession.isInitializing.value
 );
-const errorText = computed(() =>
-  authSession.signinMutation.isError.value
-    ? getErrorMessage(authSession.signinMutation.error.value, '密码错误')
-    : ''
-);
+// 后端对密码错误返回英文 message，这里统一成本地文案，避免中英混排。
+const errorText = computed(() => {
+  if (!authSession.signinMutation.isError.value) return '';
+  const raw = getErrorMessage(authSession.signinMutation.error.value, '密码错误');
+  return /invalid password|unauthorized|incorrect/i.test(raw) ? '密码错误，请重新输入' : raw;
+});
 
 const submit = handleSubmit(async values => {
   try {
@@ -157,6 +158,11 @@ watch(
 </script>
 
 <style scoped>
+/* Naive 的 card 模态没有内建宽度上限，这里显式收窄，避免在宽屏上铺满。 */
+:global(.security-modal) {
+  width: min(480px, calc(100vw - 2rem));
+}
+
 .unlock-card {
   display: flex;
   width: min(400px, calc(100vw - 2rem));
