@@ -265,14 +265,8 @@ onBeforeUnmount(releaseConfirmHandler);
 .sd-main-container {
   box-sizing: border-box;
   width: 100%;
-  max-width: var(--sd-content-max-width);
-  min-width: 0;
-  margin-inline: auto;
-}
-
-.sd-main-container--wide {
-  width: 100%;
   max-width: none;
+  min-width: 0;
   margin-inline: 0;
 }
 

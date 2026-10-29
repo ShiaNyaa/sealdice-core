@@ -19,17 +19,6 @@
         容器模式下禁止直接更新，请手动拉取最新镜像
       </n-tooltip>
       <n-button v-else-if="hasNewVersion" type="primary" disabled>升级新版</n-button>
-      <n-button
-        v-if="networkHealth.timestamp !== 0"
-        quaternary
-        :loading="networkHealthRefreshing"
-        @click="refreshNetworkHealth"
-      >
-        <template #icon>
-          <n-icon><i-tabler-refresh /></n-icon>
-        </template>
-        重新检测
-      </n-button>
     </PageHeader>
 
     <section class="stat-strip" aria-label="实例关键指标">
@@ -83,172 +72,106 @@
 
       <article class="stat">
         <span class="stat__label">
-          <i-tabler-world />
-          网络质量
+          <i-tabler-clock-hour-4 />
+          运行时长
         </span>
         <div class="stat__value">
-          <span class="stat__state" :class="networkTone">{{ networkLabel }}</span>
-          <span class="stat__unit">{{ networkHealth.ok.length }}/{{ networkHealth.total }} 可达</span>
+          <span v-if="overview" class="stat__state">{{ uptimeDisplay }}</span>
+          <span v-else class="stat__placeholder">—</span>
         </div>
-        <span class="stat__foot">
-          {{
-            networkHealth.timestamp === 0
-              ? '正在进行连通性检测'
-              : `${formatNetworkHealthRelativeTime(networkHealth.timestamp)}检测`
-          }}
-        </span>
+        <span class="stat__foot">启动于 {{ startedAt }}</span>
       </article>
     </section>
 
-    <section class="insight-grid">
-      <SpotlightCard class="panel panel--chart">
-        <header class="panel__head">
-          <div>
-            <h2>服务响应</h2>
-            <p>对外部服务端点的最近一次探测耗时，单位毫秒。</p>
-          </div>
+    <SpotlightCard class="panel panel--chart">
+      <header class="panel__head">
+        <div>
+          <h2>服务响应</h2>
+          <p>
+            最近一次探测耗时，单位毫秒。
+            <template v-if="networkHealth.timestamp !== 0">
+              {{ formatNetworkHealthRelativeTime(networkHealth.timestamp) }}更新
+            </template>
+          </p>
+        </div>
+        <div class="panel__actions">
           <span class="panel__badge">
             {{ networkHealth.ok.length }}/{{ networkHealth.total }} 正常
           </span>
-        </header>
-
-        <Suspense>
-          <AsyncLatencyChart v-if="networkHealth.targets.length" :targets="networkHealth.targets" />
-          <div v-else class="chart-placeholder">
-            <n-spin :size="20" />
-            <span>正在等待首次探测结果</span>
-          </div>
-        </Suspense>
-      </SpotlightCard>
-
-      <div class="side-stack">
-        <SpotlightCard class="panel panel--groups">
-          <header class="panel__head">
-            <div>
-              <h2>群组启用率</h2>
-              <p>已启用群组占全部已加入群组的比例。</p>
-            </div>
-          </header>
-
-          <div class="group-ring">
-            <Suspense>
-              <AsyncGroupChart :joined="groupSummary?.joined ?? 0" :enabled="groupSummary?.enabled ?? 0" />
-            </Suspense>
-            <div class="group-ring__legend">
-              <span><i class="dot dot--primary" />已启用 {{ groupSummary?.enabled ?? 0 }}</span>
-              <span><i class="dot dot--muted" />未启用 {{ inactiveGroups }}</span>
-            </div>
-          </div>
-        </SpotlightCard>
-
-        <section class="panel panel--services">
-          <header class="panel__head">
-            <div>
-              <h2>连通性</h2>
-              <p>各机器人平台 API 的实时可达状态。</p>
-            </div>
-          </header>
-
-          <ul class="service-list">
-            <li
-              v-for="target in networkHealth.targets"
-              :key="target.target"
-              class="service-list__item"
-            >
-              <span class="service-list__dot" :class="{ 'is-down': !target.ok }" />
-              <span class="service-list__label">{{ target.label }}</span>
-              <span class="service-list__latency">
-                {{ target.ok ? `${target.durationMs} ms` : '不可达' }}
-              </span>
-            </li>
-            <li v-if="!networkHealth.targets.length" class="service-list__empty">检测中…</li>
-          </ul>
-        </section>
-      </div>
-    </section>
-
-    <section class="bottom-grid">
-      <section class="log-panel">
-        <header class="log-panel__header">
-          <div class="log-title">
-            <h2>运行日志</h2>
-            <span class="log-transport">
-              {{
-                logStream.transport === 'polling'
-                  ? '轮询'
-                  : logStream.transport === 'sse'
-                    ? 'SSE'
-                    : '未连接'
-              }}
-            </span>
-          </div>
-          <div class="log-controls">
-            <n-checkbox v-model:checked="displayReverse" size="small">最新在前</n-checkbox>
-            <n-checkbox v-model:checked="autoRefresh" size="small">保持刷新</n-checkbox>
-            <n-button size="tiny" quaternary @click="logStream.reconnect">重连</n-button>
-            <n-button
-              size="tiny"
-              type="primary"
-              secondary
-              :disabled="!logOverflow || logAtLatest"
-              :aria-label="logAtLatest ? '已在最新日志' : '跳到最新一条日志'"
-              @click="scrollToLatestLog"
-            >
-              {{ logAtLatest ? '已是最新' : '跳到最新' }}
-            </n-button>
-          </div>
-        </header>
-
-        <TipBox v-if="logStream.errorText" type="error" class="log-alert">
-          {{ logStream.errorText }}
-        </TipBox>
-
-        <div ref="logsContainer" class="logs">
-          <ListEmptyState v-if="!logData.length" description="暂无运行日志" />
-          <n-data-table
-            v-else
-            ref="logTable"
-            :data="logData"
-            :columns="columns"
-            :row-key="getLogRowKey"
-            :class="isMobile ? 'w-full' : ''"
-            :bordered="false"
+          <n-button
+            v-if="networkHealth.timestamp !== 0"
             size="small"
-            :max-height="isMobile ? 340 : 388"
-            :virtual-scroll="!isMobile"
-          />
-        </div>
-      </section>
-
-      <aside class="timeline-panel">
-        <header class="panel__head">
-          <div>
-            <h2>最近事件</h2>
-            <p>最新写入的运行记录。</p>
-          </div>
-          <span class="panel__badge">{{ recentEvents.length }} 条</span>
-        </header>
-
-        <ol class="timeline">
-          <li
-            v-for="event in recentEvents"
-            :key="event.id"
-            class="timeline__item"
-            :class="`is-${getLogLevelMeta(event.level).tone}`"
+            secondary
+            :loading="networkHealthRefreshing"
+            @click="refreshNetworkHealth"
           >
-            <span class="timeline__dot" />
-            <div class="timeline__body">
-              <div class="timeline__meta">
-                <time>{{ dayjs.unix(event.ts).format('HH:mm:ss') }}</time>
-                <span class="timeline__level">{{ getLogLevelMeta(event.level).label }}</span>
-                <span v-if="event.module" class="timeline__module">{{ event.module }}</span>
-              </div>
-              <p class="timeline__message">{{ event.msg }}</p>
-            </div>
-          </li>
-          <li v-if="!recentEvents.length" class="timeline__empty">暂无事件</li>
-        </ol>
-      </aside>
+            <template #icon>
+              <n-icon><i-tabler-refresh /></n-icon>
+            </template>
+            重新检测
+          </n-button>
+        </div>
+      </header>
+
+      <Suspense>
+        <AsyncLatencyChart v-if="networkHealth.targets.length" :targets="networkHealth.targets" />
+        <div v-else class="chart-placeholder">
+          <n-spin :size="20" />
+          <span>正在等待首次探测结果</span>
+        </div>
+      </Suspense>
+    </SpotlightCard>
+
+    <section class="log-panel">
+      <header class="log-panel__header">
+        <div class="log-title">
+          <h2>运行日志</h2>
+          <span class="log-transport">
+            {{
+              logStream.transport === 'polling'
+                ? '轮询'
+                : logStream.transport === 'sse'
+                  ? 'SSE'
+                  : '未连接'
+            }}
+          </span>
+        </div>
+        <div class="log-controls">
+          <n-checkbox v-model:checked="displayReverse" size="small">最新在前</n-checkbox>
+          <n-checkbox v-model:checked="autoRefresh" size="small">保持刷新</n-checkbox>
+          <n-button size="small" quaternary @click="logStream.reconnect">重连</n-button>
+          <n-button
+            size="tiny"
+            type="primary"
+            secondary
+            :disabled="!logOverflow || logAtLatest"
+            :aria-label="logAtLatest ? '已在最新日志' : '跳到最新一条日志'"
+            @click="scrollToLatestLog"
+          >
+            {{ logAtLatest ? '已是最新' : '跳到最新' }}
+          </n-button>
+        </div>
+      </header>
+
+      <TipBox v-if="logStream.errorText" type="error" class="log-alert">
+        {{ logStream.errorText }}
+      </TipBox>
+
+      <div ref="logsContainer" class="logs">
+        <ListEmptyState v-if="!logData.length" description="暂无运行日志" />
+        <n-data-table
+          v-else
+          ref="logTable"
+          :data="logData"
+          :columns="columns"
+          :row-key="getLogRowKey"
+          :class="isMobile ? 'w-full' : ''"
+          :bordered="false"
+          size="small"
+          :max-height="isMobile ? 340 : 388"
+          :virtual-scroll="!isMobile"
+        />
+      </div>
     </section>
   </main>
 </template>
@@ -286,7 +209,6 @@ const prefersReducedMotion = usePreferredReducedMotion();
 const AsyncLatencyChart = defineAsyncComponent(
   () => import('@/components/charts/LatencyChart.vue')
 );
-const AsyncGroupChart = defineAsyncComponent(() => import('@/components/charts/GroupRingChart.vue'));
 
 const pageRef = useTemplateRef<HTMLElement>('pageRef');
 
@@ -325,6 +247,23 @@ const inactiveGroups = computed(() =>
 const runtimeSummary = computed(() =>
   formatRuntimeSummary(overview.value?.runtime, { withMode: true })
 );
+const uptimeSeconds = computed(() => Number(overview.value?.runtime.uptime ?? 0));
+const uptimeDisplay = computed(() => {
+  const total = uptimeSeconds.value;
+  if (!total) return '—';
+  const days = Math.floor(total / 86400);
+  const hours = Math.floor((total % 86400) / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  if (days) return `${days} 天 ${hours} 小时`;
+  if (hours) return `${hours} 小时 ${minutes} 分`;
+  if (minutes) return `${minutes} 分钟`;
+  return '刚刚启动';
+});
+const startedAt = computed(() =>
+  uptimeSeconds.value
+    ? dayjs().subtract(uptimeSeconds.value, 'second').format('MM-DD HH:mm')
+    : '—'
+);
 const hasNewVersion = computed(() => {
   const version = overview.value?.version;
   if (!version) return false;
@@ -346,30 +285,6 @@ const networkHealth = computed(() =>
   normalizeNetworkHealthData(networkHealthQuery.data.value?.item)
 );
 const networkHealthRefreshing = computed(() => networkHealthQuery.isFetching.value);
-
-const networkLabel = computed(() => {
-  if (networkHealth.value.timestamp === 0) return '检测中';
-  if (networkHealth.value.total === 0) return '未知';
-  if (networkHealth.value.ok.length === 0) return '中断';
-  if (networkHealth.value.ok.length === networkHealth.value.total) return '良好';
-  return '较差';
-});
-
-const networkTone = computed(() => {
-  switch (networkLabel.value) {
-    case '良好':
-      return 'is-success';
-    case '较差':
-      return 'is-warning';
-    case '中断':
-      return 'is-error';
-    default:
-      return 'is-primary';
-  }
-});
-
-// 最近事件直接取实时日志尾部，避免再维护一份独立的时间轴数据源。
-const recentEvents = computed(() => visibleLogs.value.slice(-6).reverse());
 
 watch(
   [() => logStream.logs, autoRefresh],
@@ -559,8 +474,7 @@ onMounted(() => {
     timeline
       .from('.sd-page-header', { y: 10, opacity: 0, duration: 0.45 })
       .from('.stat', { y: 16, opacity: 0, duration: 0.5, stagger: 0.06 }, '-=0.2')
-      .from('.panel', { y: 18, opacity: 0, duration: 0.55, stagger: 0.07 }, '-=0.28')
-      .from('.timeline__item', { x: 8, opacity: 0, duration: 0.4, stagger: 0.05 }, '-=0.3')
+      .from('.panel', { y: 18, opacity: 0, duration: 0.55 }, '-=0.28')
       .from('.log-panel', { y: 14, opacity: 0, duration: 0.45 }, '-=0.35');
   }, root);
 
@@ -581,7 +495,7 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--sd-border);
-  border-radius: var(--sd-radius-pill);
+  border-radius: var(--sd-radius-sm);
   background: var(--sd-bg-elevated);
   color: var(--sd-text-muted);
   font-size: 0.6875rem;
@@ -643,6 +557,7 @@ onBeforeUnmount(() => {
 
 .stat__value {
   display: flex;
+  min-height: 2rem;
   align-items: baseline;
   gap: 0.35rem;
 }
@@ -658,7 +573,7 @@ onBeforeUnmount(() => {
 
 .stat__state {
   color: var(--sd-text-primary);
-  font-size: 1.55rem;
+  font-size: 1.5rem;
   font-weight: 580;
   letter-spacing: -0.03em;
   line-height: 1.2;
@@ -690,33 +605,8 @@ onBeforeUnmount(() => {
   font-weight: 520;
 }
 
-.is-success {
-  color: var(--sd-success);
-}
-
-.is-warning {
-  color: var(--sd-warning);
-}
-
-.is-error {
-  color: var(--sd-error);
-}
-
-.is-primary {
-  color: var(--sd-primary);
-}
-
-/* 主区：图表占主列，右侧是两块窄面板。 */
-.insight-grid {
-  display: grid;
-  align-items: stretch;
-  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-  gap: 1rem;
-}
-
 .panel,
-.log-panel,
-.timeline-panel {
+.log-panel {
   border: 1px solid var(--sd-border);
   border-radius: var(--sd-radius-lg);
   background: var(--sd-bg-elevated);
@@ -749,9 +639,16 @@ onBeforeUnmount(() => {
   line-height: 1.5;
 }
 
+.panel__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .panel__badge {
   flex: 0 0 auto;
-  border-radius: var(--sd-radius-pill);
+  border-radius: var(--sd-radius-xs);
   background: var(--sd-bg-control);
   color: var(--sd-text-muted);
   font-size: 0.6875rem;
@@ -767,108 +664,6 @@ onBeforeUnmount(() => {
   color: var(--sd-text-muted);
   font-size: 0.8125rem;
   gap: 0.6rem;
-}
-
-.side-stack {
-  display: flex;
-  min-width: 0;
-  height: 100%;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.panel--services {
-  flex: 1 1 auto;
-}
-
-.group-ring {
-  display: flex;
-  align-items: center;
-  gap: 1.1rem;
-}
-
-.group-ring__legend {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  color: var(--sd-text-secondary);
-  font-size: 0.75rem;
-  gap: 0.45rem;
-}
-
-.dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  margin-right: 0.4rem;
-  vertical-align: middle;
-}
-
-.dot--primary {
-  background: var(--sd-primary);
-}
-
-.dot--muted {
-  background: var(--sd-border);
-}
-
-.service-list {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0;
-  padding: 0;
-  gap: 0.35rem 1.1rem;
-  list-style: none;
-}
-
-.service-list__item {
-  display: flex;
-  min-width: 0;
-  flex: 1 1 42%;
-  align-items: center;
-  color: var(--sd-text-secondary);
-  font-size: 0.75rem;
-  gap: 0.4rem;
-  padding: 0.2rem 0;
-}
-
-.service-list__dot {
-  width: 6px;
-  height: 6px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: var(--sd-success);
-}
-
-.service-list__dot.is-down {
-  background: var(--sd-error);
-}
-
-.service-list__label {
-  overflow: hidden;
-  flex: 1 1 auto;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.service-list__latency {
-  color: var(--sd-text-muted);
-  font-variant-numeric: tabular-nums;
-  font-size: 0.6875rem;
-}
-
-.service-list__empty {
-  color: var(--sd-text-muted);
-  font-size: 0.75rem;
-}
-
-/* 底部：日志为主，时间轴为辅。 */
-.bottom-grid {
-  display: grid;
-  align-items: stretch;
-  grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
-  gap: 1rem;
 }
 
 .log-panel {
@@ -897,7 +692,7 @@ onBeforeUnmount(() => {
 }
 
 .log-transport {
-  border-radius: var(--sd-radius-pill);
+  border-radius: var(--sd-radius-xs);
   background: var(--sd-bg-control);
   color: var(--sd-text-muted);
   font-size: 0.625rem;
@@ -986,121 +781,6 @@ onBeforeUnmount(() => {
   line-height: 1.6;
 }
 
-.timeline-panel {
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  gap: 0.9rem;
-  padding: 1.15rem 1.3rem 1.3rem;
-}
-
-.timeline {
-  position: relative;
-  display: flex;
-  flex: 1 1 auto;
-  margin: 0;
-  padding: 0 0 0 1rem;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 0.2rem;
-  list-style: none;
-}
-
-.timeline::before {
-  position: absolute;
-  top: 0.6rem;
-  bottom: 0.6rem;
-  left: 3px;
-  width: 1px;
-  background: var(--sd-border-soft);
-  content: '';
-}
-
-.timeline__item {
-  position: relative;
-  display: flex;
-  gap: 0.7rem;
-  padding: 0.35rem 0;
-}
-
-.timeline__item + .timeline__item {
-  border-top: 1px solid var(--sd-border-soft);
-}
-
-.timeline__dot {
-  position: absolute;
-  z-index: 1;
-  top: 0.72rem;
-  left: -1rem;
-  width: 7px;
-  height: 7px;
-  border: 1px solid var(--sd-bg-elevated);
-  border-radius: 50%;
-  background: var(--sd-text-muted);
-}
-
-.timeline__item.is-info .timeline__dot {
-  background: var(--sd-primary);
-}
-
-.timeline__item.is-warning .timeline__dot {
-  background: var(--sd-warning);
-}
-
-.timeline__item.is-error .timeline__dot {
-  background: var(--sd-error);
-}
-
-.timeline__body {
-  min-width: 0;
-  flex: 1 1 auto;
-}
-
-.timeline__meta {
-  display: flex;
-  align-items: center;
-  color: var(--sd-text-muted);
-  font-size: 0.6875rem;
-  gap: 0.45rem;
-  line-height: 1.3;
-}
-
-.timeline__level {
-  font-family: var(--sd-font-code);
-  letter-spacing: 0.02em;
-}
-
-.timeline__module {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.timeline__message {
-  display: -webkit-box;
-  margin: 0.15rem 0 0;
-  overflow: hidden;
-  color: var(--sd-text-secondary);
-  font-size: 0.75rem;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.timeline__empty {
-  color: var(--sd-text-muted);
-  font-size: 0.75rem;
-  padding: 0.5rem 0;
-}
-
-@media (max-width: 1100px) {
-  .insight-grid,
-  .bottom-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 860px) {
   .stat-strip {
     grid-template-columns: 1fr;
@@ -1115,12 +795,28 @@ onBeforeUnmount(() => {
     padding: 0.95rem 1.1rem;
   }
 
-  .stat__number {
-    font-size: 1.55rem;
+  .stat__value {
+    min-height: 1.8rem;
+  }
+
+  .stat__number,
+  .stat__placeholder {
+    font-size: 1.5rem;
   }
 
   .stat__state {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
+  }
+
+  .panel__head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .panel__actions {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 
@@ -1133,12 +829,6 @@ onBeforeUnmount(() => {
 
   .log-controls {
     justify-content: flex-start;
-  }
-
-  .group-ring {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.6rem;
   }
 }
 </style>

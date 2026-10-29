@@ -29,7 +29,7 @@ withDefaults(
 <style scoped>
 .setting-row {
   display: grid;
-  grid-template-columns: minmax(12rem, 17rem) minmax(12rem, 24rem);
+  grid-template-columns: minmax(12rem, 17rem) minmax(0, 1fr);
   align-items: center;
   gap: var(--sd-space-lg);
   min-height: 3rem;
@@ -77,16 +77,14 @@ withDefaults(
 
 .setting-row-control {
   display: flex;
+  max-width: 30rem;
   justify-content: flex-start;
   min-width: 0;
 }
 
-.setting-row-inline .setting-row-control {
-  min-width: 0;
-}
-
+/* 单按钮行也沿用同一列宽，避免操作按钮被推到卡片最右侧。 */
 .setting-row-inline {
-  grid-template-columns: auto max-content;
+  grid-template-columns: minmax(12rem, 17rem) minmax(0, 1fr);
 }
 
 .setting-row-stacked .setting-row-copy,
@@ -96,6 +94,7 @@ withDefaults(
 }
 
 .setting-row-stacked .setting-row-control {
+  max-width: none;
   flex-basis: auto;
 }
 

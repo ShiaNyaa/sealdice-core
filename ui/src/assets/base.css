@@ -77,8 +77,8 @@ body {
   --sd-bg-sidebar-selected-strong: color-mix(in srgb, var(--sd-primary) 14%, transparent);
 
   /* 形态 */
-  --sd-radius-xs: 5px;
-  --sd-radius-sm: 7px;
+  --sd-radius-xs: 6px;
+  --sd-radius-sm: 8px;
   --sd-radius-md: 10px;
   --sd-radius-lg: 14px;
   --sd-radius-pill: 999px;
@@ -91,7 +91,6 @@ body {
     'Microsoft YaHei', '微软雅黑', sans-serif;
   --sd-font-code:
     'Geist Mono Variable', 'JetBrains Mono Variable', 'PingFang SC', 'Microsoft YaHei', monospace;
-  --sd-content-max-width: 1240px;
 
   /* 间距 */
   --sd-space-2xs: 0.25rem;
@@ -526,6 +525,11 @@ select {
   height: 2px;
   border-radius: 2px;
   background: var(--sd-primary);
+}
+
+/* 标签页与内容之间保持稳定间距，避免各页自己补 margin。 */
+.n-tabs .n-tabs-pane-wrapper {
+  margin-top: 1.1rem;
 }
 
 /* ------------------------------------------------------------------

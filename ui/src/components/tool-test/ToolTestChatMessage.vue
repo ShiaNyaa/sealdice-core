@@ -221,7 +221,7 @@ const roleMeta = computed(() => {
 
 .tool-test-chat-message__tip {
   padding: 0.3rem 0.7rem;
-  border-radius: var(--sd-radius-pill);
+  border-radius: var(--sd-radius-xs);
   color: var(--sd-text-muted);
   background: var(--sd-bg-control);
   font-size: 0.75rem;

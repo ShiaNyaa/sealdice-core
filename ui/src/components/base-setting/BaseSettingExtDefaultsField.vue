@@ -329,7 +329,7 @@ function getCommandEntries(item: BaseSettingExtDefaultSettingItem) {
   cursor: pointer;
   padding: 0.36rem 0.66rem;
   border: 1px solid color-mix(in srgb, var(--sd-border), transparent 8%);
-  border-radius: var(--sd-radius-pill);
+  border-radius: var(--sd-radius-sm);
   background: var(--sd-bg-elevated);
   color: var(--sd-text-secondary);
   font: inherit;

@@ -25,34 +25,34 @@ import userCancel from '@iconify-icons/tabler/user-cancel';
 import usersGroup from '@iconify-icons/tabler/users-group';
 
 /**
- * 只注册导航会用到的图标数据：@iconify/vue 在运行时按名称取图标，
- * 这里显式离线注册，避免内网部署时向公共 API 请求图标。
+ * 导航图标表：key 必须与 router/navigation.ts 里的 icon 值一一对应。
+ * @iconify/vue 运行时按名称取图标，这里显式离线注册，避免内网部署时请求公共 API。
  */
 const navigationIcons = {
-  activity,
-  'adjustments-horizontal': adjustments,
-  archive,
-  'book-2': book2,
-  books,
-  cards,
-  command,
-  'dice-5': dice5,
-  'file-code': fileCode,
   home,
-  'info-circle': infoCircle,
+  connection: plug,
+  setting: messageCog,
+  edit: puzzle,
+  reply: messages,
+  package: packages,
+  js: fileCode,
+  deck: cards,
+  story: book2,
+  helpdoc: books,
+  censor: shield,
+  operation: adjustments,
+  'base-setting': settings,
+  group: usersGroup,
+  ban: userCancel,
+  dice: dice5,
+  backup: archive,
+  'advanced-setting': settingsExclamation,
+  tools: tool,
+  test: command,
+  resource: photo,
+  profile: activity,
+  star: infoCircle,
   'menu-2': menu,
-  'message-cog': messageCog,
-  messages,
-  packages,
-  photo,
-  'plug-connected': plug,
-  puzzle,
-  settings,
-  'settings-exclamation': settingsExclamation,
-  'shield-exclamation': shield,
-  tool,
-  'user-cancel': userCancel,
-  'users-group': usersGroup,
 } as const;
 
 export type NavigationIconName = keyof typeof navigationIcons;

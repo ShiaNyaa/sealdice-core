@@ -211,7 +211,7 @@ async function handleSelectProfile(profile: ToolTestProfile) {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--sd-border);
-  border-radius: var(--sd-radius-pill);
+  border-radius: var(--sd-radius-sm);
   background: var(--sd-bg-elevated);
   color: var(--sd-text-muted);
   font-size: 0.6875rem;
@@ -259,9 +259,11 @@ async function handleSelectProfile(profile: ToolTestProfile) {
 }
 
 .tool-test-toolbar__label {
+  flex: 0 0 auto;
   color: var(--sd-text-muted);
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .tool-test-page__controls {
@@ -345,6 +347,11 @@ async function handleSelectProfile(profile: ToolTestProfile) {
   padding: 0.65rem 0.75rem max(0.65rem, env(safe-area-inset-bottom));
   border-top: 1px solid var(--sd-border-soft);
   background: var(--sd-bg-elevated);
+}
+
+/* matechat 自带的 pill 按钮与全局按钮圆角不一致，这里统一。 */
+.tool-test-page__composer :deep(.mc-button) {
+  border-radius: var(--sd-radius-sm);
 }
 
 @media (max-width: 1100px) {

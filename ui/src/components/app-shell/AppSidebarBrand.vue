@@ -130,7 +130,7 @@ const { overview, appName, channelText } = useBaseOverview();
 
 .brand-badge {
   border: 1px solid var(--sd-border);
-  border-radius: var(--sd-radius-pill);
+  border-radius: var(--sd-radius-xs);
   color: var(--sd-text-muted);
   font-size: 0.625rem;
   line-height: 1;

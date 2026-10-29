@@ -199,7 +199,7 @@ const visibleBreadcrumbItems = computed(() =>
   height: 32px;
   align-items: center;
   border: 1px solid var(--sd-border);
-  border-radius: var(--sd-radius-pill);
+  border-radius: var(--sd-radius-sm);
   background: var(--sd-bg-elevated);
   color: var(--sd-text-muted);
   cursor: pointer;
@@ -247,7 +247,7 @@ const visibleBreadcrumbItems = computed(() =>
 }
 
 .version-channel {
-  border-radius: var(--sd-radius-pill);
+  border-radius: var(--sd-radius-xs);
   background: var(--sd-bg-control);
   color: var(--sd-text-muted);
   font-size: 0.625rem;

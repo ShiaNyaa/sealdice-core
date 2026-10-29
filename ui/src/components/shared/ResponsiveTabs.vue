@@ -81,16 +81,23 @@ const selectedOption = computed(
 }
 
 .sd-setting-tabs :deep(.n-tabs-nav) {
-  display: inline-flex;
-  max-width: 100%;
+  display: flex;
+  width: 100%;
   border: 1px solid var(--sd-border);
-  border-radius: var(--sd-radius-pill);
+  border-radius: var(--sd-radius-sm);
   background: var(--sd-bg-elevated-soft);
+  overflow: hidden;
   padding: 3px;
 }
 
 .sd-setting-tabs :deep(.n-tabs-nav-scroll-content) {
   gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.sd-setting-tabs :deep(.n-tabs-nav-scroll-content)::-webkit-scrollbar {
+  display: none;
 }
 
 .sd-setting-tabs :deep(.n-tabs-tab-pad) {
@@ -99,7 +106,7 @@ const selectedOption = computed(
 
 .sd-setting-tabs :deep(.n-tabs-tab) {
   height: 30px;
-  border-radius: var(--sd-radius-pill);
+  border-radius: var(--sd-radius-sm);
   color: var(--sd-text-muted);
   font-size: 0.78125rem;
   padding: 0 0.8rem;

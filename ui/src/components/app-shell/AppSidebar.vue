@@ -141,14 +141,13 @@ function containsActive(item: NavigationItem): boolean {
   );
 }
 
-// 动态分类分组默认收起，避免把侧栏撑成一整屏；当前所在分组始终展开。
+// 分组默认全部收起，只有当前路由所在的组自动展开；手动展开的偏好只作用于当前页面。
 const overrides = ref<Record<string, boolean>>({});
 
 function isGroupOpen(item: NavigationItem) {
   const override = overrides.value[item.label];
   if (override !== undefined) return override;
-  if (containsActive(item)) return true;
-  return item.dynamicChildren !== 'customTextCategories';
+  return containsActive(item);
 }
 
 function toggleGroup(label: string) {
@@ -256,7 +255,6 @@ watch(currentPath, () => {
 }
 
 .sd-nav-item--top {
-  height: 36px;
   margin-bottom: 0.15rem;
 }
 

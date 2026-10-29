@@ -223,9 +223,10 @@ function createCommonOverrides(theme: ResolvedTheme): NonNullable<GlobalThemeOve
       fontFamilyMono: 'var(--sd-font-code)',
       fontWeightStrong: '600',
       lineHeight: '1.6',
-      heightMedium: '34px',
-      heightLarge: '38px',
+      heightTiny: '24px',
       heightSmall: '28px',
+      heightMedium: '32px',
+      heightLarge: '36px',
       // Naive 会对部分颜色做 alpha 计算，这里必须给可解析的具体色值，
       // 不能使用 var()（seemly/rgba 无法解析 CSS 变量）。
       textColorBase: theme === 'dark' ? '#f2f5fa' : '#101724',
@@ -336,8 +337,14 @@ export function createThemeOverrides(theme: ResolvedTheme): GlobalThemeOverrides
         {}
       ) as NonNullable<GlobalThemeOverrides['Button']>),
       fontWeight: '500',
+      borderRadiusTiny: 'var(--sd-radius-xs)',
+      borderRadiusSmall: 'var(--sd-radius-sm)',
       borderRadiusMedium: 'var(--sd-radius-sm)',
-      borderRadiusLarge: 'var(--sd-radius-md)',
+      borderRadiusLarge: 'var(--sd-radius-sm)',
+      heightTiny: '24px',
+      heightSmall: '28px',
+      heightMedium: '32px',
+      heightLarge: '36px',
     },
     Card: {
       borderRadius: 'var(--sd-radius-lg)',
@@ -381,7 +388,7 @@ export function createThemeOverrides(theme: ResolvedTheme): GlobalThemeOverrides
       borderRadius: 'var(--sd-radius-md)',
     },
     Tag: {
-      borderRadius: 'var(--sd-radius-pill)',
+      borderRadius: 'var(--sd-radius-xs)',
     },
     DataTable: {
       thColor: 'transparent',

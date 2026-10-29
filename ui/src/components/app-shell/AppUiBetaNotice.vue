@@ -74,7 +74,7 @@ function handleClose() {
 
 .sd-beta-notice__action {
   flex: 0 0 auto;
-  border-radius: var(--sd-radius-pill);
+  border-radius: var(--sd-radius-sm);
   background: var(--sd-bg-control);
   color: var(--sd-text-secondary);
   font-size: 0.6875rem;
